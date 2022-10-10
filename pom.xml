@@ -11,7 +11,7 @@
 	<groupId>playdata</groupId>
 	<artifactId>aichief-springboot-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>aichief-springboot-backend</name>
 	<description>Spring Boot Web Application</description>
 	<properties>
