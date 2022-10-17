@@ -11,6 +11,6 @@ public class TestController {
 	
 	@GetMapping
 	public String hello(@RequestParam("name") String name) {
-		return String.join(" ", "Hello", name);
+		return String.join(" ", name, "Test Success");
 	}
 }
