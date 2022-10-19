@@ -5,19 +5,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import kr.pe.aichief.model.dto.ClientDTO;
-import kr.pe.aichief.model.service.ClientService;
+import kr.pe.aichief.model.dto.ManagerDTO;
+import kr.pe.aichief.model.service.ManagerService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/client")
+@RequestMapping("/manager")
 @RequiredArgsConstructor
-public class ClientController {
+public class ManagerController {
 	
-	private final ClientService clientService;
+	private final ManagerService managerService;
 	
 	@GetMapping
-	public ClientDTO getClientInfo(@RequestParam("name") String name, @RequestParam("email") String email) {
-		return clientService.getClient(name, email);
+	public ManagerDTO getManagerInfo(@RequestParam("name") String name, @RequestParam("email") String email) {
+		return managerService.getManager(name, email);
 	}
 }

@@ -1,7 +1,5 @@
 package kr.pe.aichief.model.service;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.springframework.stereotype.Service;
 
 import kr.pe.aichief.model.dto.ClientDTO;
@@ -14,7 +12,7 @@ public class ClientService {
 	
 	private final ClientRepository clientRepository;
 	
-	public ClientDTO findByPhoneNumber(String phoneNumber) {
-		return ClientDTO.toClientDTO(clientRepository.findById(phoneNumber).orElseThrow(() -> new EntityNotFoundException("Client Not Found: " + phoneNumber)));
+	public ClientDTO getClient(String name, String email) {
+		return ClientDTO.toClientDTO(clientRepository.findByNameAndEmail(name, email));
 	}
 }

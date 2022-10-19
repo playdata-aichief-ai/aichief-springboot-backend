@@ -1,15 +1,11 @@
 package kr.pe.aichief.model.dto;
 
 import kr.pe.aichief.model.dao.Client;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @Getter
 @Setter
@@ -17,38 +13,39 @@ import lombok.ToString;
 
 public class ClientDTO {
 	
-	private String phoneNumber;
+	private int actorId;
 	
 	private String name;
+	
+	private String email;
+	
+	private String birthDay;
+	
+	private String phoneNumber;
+	
+	private String companyName;
+	
+	private String joinDate;
 	
 	private String socialSecurityNumber;
 	
 	private String address;
 	
-	private String email;
-	
-	private String companyName;
-	
-	private String job;
-	
 	private String nationality;
 	
 	private String englishName;
 	
-	/**
-	 * Convert ClientDTO to Client
-	 * @param client
-	 * @return ClientDTO
-	 */
 	public static ClientDTO toClientDTO(Client client) {
 		return ClientDTO.builder()
-				.phoneNumber(client.getPhoneNumber())
+				.actorId(client.getActorId())
 				.name(client.getName())
+				.email(client.getEmail())
+				.birthDay(client.getBirthDay())
+				.phoneNumber(client.getPhoneNumber())
+				.companyName(client.getCompanyName())
+				.joinDate(client.getJoinDate())
 				.socialSecurityNumber(client.getSocialSecurityNumber())
 				.address(client.getAddress())
-				.email(client.getEmail())
-				.companyName(client.getCompanyName())
-				.job(client.getJob())
 				.nationality(client.getNationality())
 				.englishName(client.getEnglishName())
 				.build();
