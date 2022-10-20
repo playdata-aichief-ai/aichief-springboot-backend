@@ -1,31 +1,17 @@
 package kr.pe.aichief.model.dto;
 
 import kr.pe.aichief.model.dao.Manager;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 @ToString
 
-public class ManagerDTO {
-	
-	private int actorId;
-	
-	private String name;
-	
-	private String email;
-	
-	private String birthDay;
-	
-	private String phoneNumber;
-	
-	private String companyName;
-	
-	private String joinDate;
+public class ManagerDTO extends ActorDTO {
 	
 	private String state;
 	
@@ -38,6 +24,7 @@ public class ManagerDTO {
 				.phoneNumber(manager.getPhoneNumber())
 				.companyName(manager.getCompanyName())
 				.joinDate(manager.getJoinDate())
+				.role(manager.getRole())
 				.state(manager.getState())
 				.build();
 	}

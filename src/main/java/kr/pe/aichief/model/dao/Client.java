@@ -22,6 +22,8 @@ public class Client extends Actor {
 	@Column(name = "social_security_number")
 	private String socialSecurityNumber;
 	
+	private String job;
+	
 	private String address;
 	
 	private String nationality;
@@ -38,7 +40,9 @@ public class Client extends Actor {
 				.phoneNumber(clientDto.getPhoneNumber())
 				.companyName(clientDto.getCompanyName())
 				.joinDate(clientDto.getJoinDate())
+				.role(clientDto.getRole())
 				.socialSecurityNumber(clientDto.getSocialSecurityNumber())
+				.job(clientDto.getJob())
 				.address(clientDto.getAddress())
 				.nationality(clientDto.getNationality())
 				.englishName(clientDto.getEnglishName())

@@ -8,5 +8,5 @@ import kr.pe.aichief.model.dao.Client;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Integer> {
 
-	Client findByNameAndEmail(String name, String email);
+	Client findByEmail(String email);
 }

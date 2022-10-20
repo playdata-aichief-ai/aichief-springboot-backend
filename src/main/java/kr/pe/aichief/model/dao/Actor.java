@@ -1,7 +1,6 @@
 package kr.pe.aichief.model.dao;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,7 +22,6 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn
 public class Actor {
 	
 	@Id
@@ -48,4 +46,7 @@ public class Actor {
 	
 	@Column(name = "join_date")
 	private String joinDate;
+	
+	@Column(nullable = false)
+	private String role;
 }

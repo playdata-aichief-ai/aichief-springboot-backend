@@ -29,6 +29,7 @@ public class Manager extends Actor {
 				.phoneNumber(managerDto.getPhoneNumber())
 				.companyName(managerDto.getCompanyName())
 				.joinDate(managerDto.getJoinDate())
+				.role(managerDto.getRole())
 				.state(managerDto.getState())
 				.build();
 	}

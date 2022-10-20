@@ -6,5 +6,5 @@ import kr.pe.aichief.model.dao.Manager;
 
 public interface ManagerRepository extends JpaRepository<Manager, Integer> {
 	
-	Manager findByNameAndEmail(String name, String email);
+	Manager findByEmail(String email);
 }

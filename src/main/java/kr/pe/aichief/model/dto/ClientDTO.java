@@ -1,35 +1,23 @@
 package kr.pe.aichief.model.dto;
 
 import kr.pe.aichief.model.dao.Client;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 @ToString
 
-public class ClientDTO {
-	
-	private int actorId;
-	
-	private String name;
-	
-	private String email;
-	
-	private String birthDay;
-	
-	private String phoneNumber;
-	
-	private String companyName;
-	
-	private String joinDate;
+public class ClientDTO extends ActorDTO {
 	
 	private String socialSecurityNumber;
 	
 	private String address;
+	
+	private String job;
 	
 	private String nationality;
 	
@@ -44,8 +32,10 @@ public class ClientDTO {
 				.phoneNumber(client.getPhoneNumber())
 				.companyName(client.getCompanyName())
 				.joinDate(client.getJoinDate())
+				.role(client.getRole())
 				.socialSecurityNumber(client.getSocialSecurityNumber())
 				.address(client.getAddress())
+				.job(client.getJob())
 				.nationality(client.getNationality())
 				.englishName(client.getEnglishName())
 				.build();

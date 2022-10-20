@@ -6,16 +6,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import kr.pe.aichief.model.service.ClientService;
+import kr.pe.aichief.model.service.ActorService;
 
-@WebMvcTest(ClientController.class)
-public class ClientControllerTest {
+@WebMvcTest(ActorController.class)
+public class ActorControllerTest {
 	
 	@Autowired
 	private MockMvc mockMvc;
 	
 	@MockBean
-	private ClientService clientService;
+	private ActorService clientService;
 	
 	@Test
 	void searchClientInfoTest() throws Exception {
