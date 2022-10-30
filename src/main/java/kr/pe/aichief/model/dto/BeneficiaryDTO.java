@@ -1,6 +1,7 @@
 package kr.pe.aichief.model.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,9 +17,9 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class ManagerDTO {
+public class BeneficiaryDTO {
 	
-	private int managerId;
+	private int beneficiaryId;
 	
 	private String name;
 	
@@ -27,4 +28,20 @@ public class ManagerDTO {
 	private String phoneNumber;
 	
 	private LocalDate joinDate;
+	
+	private String socialSecurityNumber;
+	
+	private String job;
+	
+	private String landline;
+	
+	private String address;
+	
+	private String relationshipWithInsured;
+	
+	private IdentificationDTO identificationDTO;
+	
+	private List<AnotherSubscribeDTO> anotherSubscribeDTOs;
+	
+	private AccountDTO accountDTO;
 }

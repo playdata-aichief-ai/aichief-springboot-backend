@@ -1,11 +1,10 @@
-package kr.pe.aichief.model.dao;
+package kr.pe.aichief.model.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
@@ -24,15 +23,14 @@ import lombok.ToString;
 public class Assign {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "assign_id")
 	private int assignId;
 	
-	@OneToOne
-	@JoinColumn(name = "client_id")
-	private Client client;
-	
-	@OneToOne
+	@ManyToOne(targetEntity = Manager.class)
 	@JoinColumn(name = "manager_id")
 	private Manager manager;
+	
+	@OneToOne(targetEntity = Claim.class)
+	@JoinColumn(name = "claim_id")
+	private Claim claim;
 }

@@ -1,34 +1,24 @@
 package kr.pe.aichief.model.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
+@Builder
 @Getter
 @Setter
 @ToString
 
-public class ActorDTO {
-
-	private int actorId;
+public class AnotherSubscribeDTO {
 	
-	private String name;
-	
-	private String email;
-	
-	private String birthDay;
-	
-	private String phoneNumber;
+	private int anotherSubscribeId;
 	
 	private String companyName;
 	
-	private String joinDate;
-	
-	private String role;
+	private int number;
 }

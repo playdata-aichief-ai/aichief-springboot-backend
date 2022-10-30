@@ -16,15 +16,15 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class ManagerDTO {
+public class IdentificationDTO {
+
+	private int identificationId;
 	
-	private int managerId;
+	private String number;
 	
-	private String name;
+	private String serialNumber;
 	
-	private String email;
+	private LocalDate issueDate;
 	
-	private String phoneNumber;
-	
-	private LocalDate joinDate;
+	private String issueBy;
 }
