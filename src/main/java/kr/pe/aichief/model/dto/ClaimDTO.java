@@ -16,15 +16,17 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class ManagerDTO {
+public class ClaimDTO {
+
+	private int claimId;
 	
-	private int managerId;
+	private InsuredDTO insuredDTO;
 	
-	private String name;
+	private BeneficiaryDTO beneficiaryDTO;
 	
-	private String email;
+	private AccidentDTO accidentDTO;
 	
-	private String phoneNumber;
+	private String reasonForPartialClaim;
 	
-	private LocalDate joinDate;
+	private LocalDate date;
 }

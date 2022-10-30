@@ -1,6 +1,6 @@
 package kr.pe.aichief.model.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,15 +16,15 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class ManagerDTO {
+public class AccidentDTO {
+
+	private int accidentId;
 	
-	private int managerId;
+	private LocalDateTime dateTime;
 	
-	private String name;
+	private String location;
 	
-	private String email;
+	private String details;
 	
-	private String phoneNumber;
-	
-	private LocalDate joinDate;
+	private String diseaseName;
 }

@@ -16,9 +16,9 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class ManagerDTO {
+public class InsuredDTO {
 	
-	private int managerId;
+	private int insuredId;
 	
 	private String name;
 	
@@ -27,4 +27,8 @@ public class ManagerDTO {
 	private String phoneNumber;
 	
 	private LocalDate joinDate;
+	
+	private String socialSecurityNumber;
+	
+	private String job;
 }
