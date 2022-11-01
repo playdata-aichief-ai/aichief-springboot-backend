@@ -14,11 +14,17 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class AssignDTO {
+public class ClaimDto {
 
-	private int assignId;
+	private String claim;
 	
-	private ManagerDTO managerDTO;
+	private String contract;
 	
-	private ClaimDTO claimDTO;
+	private String insured;
+	
+	private String beneficiary;
+	
+	private String insurance;
+	
+	private String accident;
 }

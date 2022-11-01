@@ -14,13 +14,7 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class AccountDTO {
-
-	private int accountId;
+public class ManagerDto {
 	
-	private String bankName;
-	
-	private String number;
-	
-	private String holder;
+	private String manager;
 }

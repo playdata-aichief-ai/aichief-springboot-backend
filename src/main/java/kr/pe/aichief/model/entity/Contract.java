@@ -1,13 +1,12 @@
 package kr.pe.aichief.model.entity;
 
-import java.time.LocalDate;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
@@ -23,27 +22,35 @@ import lombok.ToString;
 @ToString
 
 @Entity
-public class Identification {
-
+public class Contract {
+	
 	@Id
-	@Column(name = "identification_id")
+	@Column(name = "contract_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int identificationId;
+	private int contractId;
 	
-	@Column(name = "id_number", nullable = false, unique = true)
-	private String number;
+	@Column(name = "monthly_premium")
+	private float monthlyPremium;
 	
-	@Column(name = "serial_number", unique = true)
-	private String serialNumber;
+	private String state;
 	
-	@Column(name = "issue_date")
-	private LocalDate issueDate;
+	@ToString.Exclude
+	@ManyToOne
+	@JoinColumn(name = "insured_id")
+	private Insured insured;
 	
-	@Column(name = "issue_by")
-	private String issueBy;
+	@ToString.Exclude
+	@ManyToOne
+	@JoinColumn(name = "beneficiary_id")
+	private Beneficiary beneficiary;
+	
+	@ToString.Exclude
+	@ManyToOne
+	@JoinColumn(name = "insurance_id")
+	private Insurance insurance;
 	
 	@ToString.Exclude
 	@OneToOne
-	@JoinColumn(name = "beneficiary_id", unique = true)
-	private Beneficiary beneficiary;
+	@JoinColumn(name = "claim_id", unique = true)
+	private Claim claim;
 }

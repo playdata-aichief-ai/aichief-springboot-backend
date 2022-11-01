@@ -1,13 +1,11 @@
 package kr.pe.aichief.model.entity;
 
-import java.time.LocalDate;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
@@ -23,27 +21,26 @@ import lombok.ToString;
 @ToString
 
 @Entity
-public class Identification {
+public class Member {
 
 	@Id
-	@Column(name = "identification_id")
+	@Column(name = "member_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int identificationId;
+	private int memberId;
 	
-	@Column(name = "id_number", nullable = false, unique = true)
-	private String number;
+	@Column(nullable = false)
+	private String email;
 	
-	@Column(name = "serial_number", unique = true)
-	private String serialNumber;
+	@Column(nullable = false)
+	private String role;
 	
-	@Column(name = "issue_date")
-	private LocalDate issueDate;
-	
-	@Column(name = "issue_by")
-	private String issueBy;
+	private String state;
 	
 	@ToString.Exclude
-	@OneToOne
-	@JoinColumn(name = "beneficiary_id", unique = true)
+	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+	private Manager manager;
+	
+	@ToString.Exclude
+	@OneToOne(mappedBy = "member")
 	private Beneficiary beneficiary;
 }

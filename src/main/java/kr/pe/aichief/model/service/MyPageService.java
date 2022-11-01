@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ClaimService {
+public class MyPageService {
+	
 	
 }
