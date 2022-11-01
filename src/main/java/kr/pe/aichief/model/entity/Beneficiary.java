@@ -3,8 +3,11 @@ package kr.pe.aichief.model.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -14,12 +17,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @ToString
 
 @Entity
@@ -27,6 +32,7 @@ public class Beneficiary {
 	
 	@Id
 	@Column(name = "beneficiary_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int beneficiaryId;
 	
 	@Column(nullable = false)
@@ -54,15 +60,28 @@ public class Beneficiary {
 	@Column(name = "relationship_with_insured")
 	private String relationshipWithInsured;
 	
-	@OneToOne(targetEntity = Identification.class)
-	@JoinColumn(name = "identification_id")
+	@ToString.Exclude
+	@OneToMany(mappedBy = "beneficiary", cascade = CascadeType.ALL)
+	private List<Insured> insureds;
+	
+	@ToString.Exclude
+	@OneToOne(mappedBy = "beneficiary", cascade = CascadeType.ALL)
 	private Identification identification;
 	
-	@OneToMany(targetEntity = AnotherSubscribe.class)
-	@JoinColumn(name = "another_subscribe_id")
+	@ToString.Exclude
+	@OneToMany(mappedBy = "beneficiary", cascade = CascadeType.ALL)
 	private List<AnotherSubscribe> anotherSubscribes;
 	
-	@OneToOne(targetEntity = Account.class)
-	@JoinColumn(name = "account_id")
+	@ToString.Exclude
+	@OneToOne(mappedBy = "beneficiary", cascade = CascadeType.ALL)
 	private Account account;
+	
+	@ToString.Exclude
+	@OneToMany(mappedBy = "beneficiary")
+	private List<Contract> contracts;
+	
+	@ToString.Exclude
+	@OneToOne
+	@JoinColumn(name = "member_id", unique = true)
+	private Member member;
 }

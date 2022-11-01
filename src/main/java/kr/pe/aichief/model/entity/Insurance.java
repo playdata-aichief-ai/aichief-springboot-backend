@@ -1,14 +1,13 @@
 package kr.pe.aichief.model.entity;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,26 +22,19 @@ import lombok.ToString;
 @ToString
 
 @Entity
-public class Accident {
-	
+public class Insurance {
+
 	@Id
-	@Column(name = "accident_id")
+	@Column(name = "insurance_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int accidentId;
+	private int insuranceId;
 	
-	@Column(name = "accident_datetime", nullable = false)
-	private LocalDateTime dateTime;
+	@Column(name = "company_name", nullable = false)
+	private String companyName;
 	
-	private String location;
-	
-	@Column(nullable = false)
 	private String details;
 	
-	@Column(name = "disease_name")
-	private String diseaseName;
-	
 	@ToString.Exclude
-	@OneToOne
-	@JoinColumn(name = "claim_id", unique = true)
-	private Claim claim;
+	@OneToMany(mappedBy = "insurance")
+	private List<Contract> contracts;
 }

@@ -1,10 +1,16 @@
 package kr.pe.aichief.model.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +29,7 @@ public class Insured {
 	
 	@Id
 	@Column(name = "insured_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int insuredId;
 	
 	@Column(nullable = false)
@@ -41,4 +48,13 @@ public class Insured {
 	private String socialSecurityNumber;
 	
 	private String job;
+	
+	@ToString.Exclude
+	@ManyToOne
+	@JoinColumn(name = "beneficiary_id")
+	private Beneficiary beneficiary;
+	
+	@ToString.Exclude
+	@OneToMany(mappedBy = "insured")
+	private List<Contract> contracts;
 }

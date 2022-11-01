@@ -2,13 +2,13 @@ package kr.pe.aichief.model.entity;
 
 import java.time.LocalDate;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
@@ -31,21 +31,22 @@ public class Claim {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int claimId;
 	
-	@ManyToOne(targetEntity = Insured.class)
-	@JoinColumn(name = "insured_id")
-	private Insured insured;
-	
-	@ManyToOne(targetEntity = Beneficiary.class)
-	@JoinColumn(name = "beneficiary_id")
-	private Beneficiary beneficiary;
-	
-	@OneToOne(targetEntity = Accident.class)
-	@JoinColumn(name = "accident_id")
-	private Accident accident;
-	
 	@Column(name = "reason_for_partial_claim")
 	private String reasonForPartialClaim;
 	
-	@Column(name = "claim_date")
+	@Column(name = "claim_date", nullable = false)
 	private LocalDate date;
+	
+	@ToString.Exclude
+	@OneToOne(mappedBy = "claim")
+	private Contract contract;
+	
+	@ToString.Exclude
+	@OneToOne(mappedBy = "claim", cascade = CascadeType.ALL)
+	private Accident accident;
+	
+	@ToString.Exclude
+	@OneToOne
+	@JoinColumn(name = "assign_id", unique = true)
+	private Assign assign;
 }

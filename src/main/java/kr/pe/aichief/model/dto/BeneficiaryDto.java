@@ -14,11 +14,13 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class AnotherSubscribeDTO {
+public class BeneficiaryDto {
 	
-	private int anotherSubscribeId;
+	private String beneficiary;
 	
-	private String companyName;
+	private String identification;
 	
-	private int number;
+	private String anotherSubscribes;
+	
+	private String account;
 }

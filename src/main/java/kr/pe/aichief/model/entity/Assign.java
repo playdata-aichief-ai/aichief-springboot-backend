@@ -2,6 +2,8 @@ package kr.pe.aichief.model.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -24,13 +26,15 @@ public class Assign {
 
 	@Id
 	@Column(name = "assign_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int assignId;
 	
-	@ManyToOne(targetEntity = Manager.class)
+	@ToString.Exclude
+	@OneToOne(mappedBy = "assign")
+	private Claim claim;
+	
+	@ToString.Exclude
+	@ManyToOne
 	@JoinColumn(name = "manager_id")
 	private Manager manager;
-	
-	@OneToOne(targetEntity = Claim.class)
-	@JoinColumn(name = "claim_id")
-	private Claim claim;
 }
