@@ -1,5 +1,7 @@
 package kr.pe.aichief.model.dto;
 
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,11 +18,11 @@ import lombok.ToString;
 
 public class ContractDto {
 
-	private String contract;
+	private Map<String, String> contract;
 	
-	private String insured;
+	private Map<String, String> insured;
 	
-	private String beneficiary;
+	private Map<String, String> beneficiary;
 	
-	private String insurance;
+	private Map<String, String> insurance;
 }

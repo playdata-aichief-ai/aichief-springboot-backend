@@ -1,5 +1,7 @@
 package kr.pe.aichief.model.dto;
 
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,11 +18,6 @@ import lombok.ToString;
 
 public class BeneficiaryDto {
 	
-	private String beneficiary;
+	private Map<String, String> beneficiary;
 	
-	private String identification;
-	
-	private String anotherSubscribes;
-	
-	private String account;
 }
