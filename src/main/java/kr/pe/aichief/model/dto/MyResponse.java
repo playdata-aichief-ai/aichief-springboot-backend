@@ -29,4 +29,5 @@ public class MyResponse {
 	private Integer count;
 	
 	private List<Object> contents;
+	
 }

@@ -1,7 +1,5 @@
 package kr.pe.aichief.model.dto;
 
-import java.util.Map;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,5 +16,13 @@ import lombok.ToString;
 
 public class ManagerDto {
 	
-	private Map<String, String> manager;
+	private String managerId;
+	
+	private String name;
+	
+	private String email;
+	
+	private String phoneNumber;
+	
+	private String joinDate;
 }

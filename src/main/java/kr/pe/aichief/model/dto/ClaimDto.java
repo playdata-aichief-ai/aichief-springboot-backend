@@ -1,7 +1,5 @@
 package kr.pe.aichief.model.dto;
 
-import java.util.Map;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,13 +16,9 @@ import lombok.ToString;
 
 public class ClaimDto {
 
-	private Map<String, String> claim;
+	private String claimId;
 	
-	private Map<String, String> insured;
+	private String reasonForPartialClaim;
 	
-	private Map<String, String> beneficiary;
-	
-	private Map<String, String> insurance;
-	
-	private Map<String, String> accident;
+	private String date;
 }

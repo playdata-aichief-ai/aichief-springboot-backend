@@ -1,8 +1,8 @@
 package kr.pe.aichief.model.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,13 +14,15 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class ClaimRequest {
+public class IdentificationDto {
+
+	private String identificationId;
 	
-	private String user;
+	private String number;
 	
-	private int contract_id;
+	private String serialNumber;
 	
-	private String company;
+	private String issueDate;
 	
-	private String image_path;
+	private String issueBy;
 }

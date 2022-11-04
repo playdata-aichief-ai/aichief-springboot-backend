@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import kr.pe.aichief.model.dto.MyResponse;
 
 @RestControllerAdvice
@@ -25,6 +28,20 @@ public class MyExceptionHandler {
 				.contents(new ArrayList<Object>())
 				.build();
 		
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+		return ResponseEntity.status(result.getHttpStatus()).body(result);
+	}
+	
+	@ExceptionHandler({JsonMappingException.class, JsonProcessingException.class})
+	public ResponseEntity<MyResponse> jsonParseExceptionHadler(Exception e) {
+		
+		MyResponse result = MyResponse.builder()
+				.code(HttpStatus.SERVICE_UNAVAILABLE.value())
+				.httpStatus(HttpStatus.SERVICE_UNAVAILABLE)
+				.count(0)
+				.message(e.getMessage())
+				.contents(new ArrayList<Object>())
+				.build();
+		
+		return ResponseEntity.status(result.getHttpStatus()).body(result);
 	}
 }
