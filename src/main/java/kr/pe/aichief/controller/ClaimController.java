@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import kr.pe.aichief.model.dto.ClaimRequest;
 import kr.pe.aichief.model.dto.MyResponse;
 import kr.pe.aichief.model.service.ClaimService;
@@ -28,11 +31,11 @@ public class ClaimController {
 	private final ClaimService claimService;
 	
 	@PostMapping
-	public ResponseEntity<MyResponse> postClaim(@RequestBody ClaimRequest claimRequset) {
+	public ResponseEntity<MyResponse> receiveClaim(@RequestBody ClaimRequest claimRequset) throws JsonMappingException, JsonProcessingException {
 		
 		MyResponse result = MyResponse.builder().contents(new ArrayList<Object>()).build();
 		
-		result.getContents().add(claimService.claim(claimRequset));
+		result.getContents().add(claimService.serveClaim(claimRequset));
 		
 		result.setCode(HttpStatus.OK.value());
 		result.setHttpStatus(HttpStatus.OK);

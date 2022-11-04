@@ -60,6 +60,17 @@ public class MyPageService {
 		return dtoConverter.beneficiaryToDto(beneficiary);
 	}
 	
+	public List<BeneficiaryDto> getBeneficiaryWithName(String name) {
+		
+		List<Beneficiary> beneficiaries = beneficiaryRepository.findByName(name);
+		
+		if(beneficiaries.isEmpty()) {
+			throw new EntityNotFoundException("Beneficiary Not Found: " + name);
+		}
+		
+		return beneficiaries.stream().map(beneficiary -> dtoConverter.beneficiaryToDto(beneficiary)).collect(Collectors.toList());
+	}
+	
 	public ManagerDto getManager(String email) {
 		
 		Manager manager = managerRepository.findByEmail(email)

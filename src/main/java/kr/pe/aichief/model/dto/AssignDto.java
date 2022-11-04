@@ -14,13 +14,7 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class ClaimRequest {
-	
-	private String user;
-	
-	private int contract_id;
-	
-	private String company;
-	
-	private String image_path;
+public class AssignDto {
+
+	private String assignId;
 }

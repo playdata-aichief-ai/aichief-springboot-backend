@@ -7,13 +7,17 @@ import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
 
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.pe.aichief.model.dto.AccidentDto;
@@ -23,7 +27,6 @@ import kr.pe.aichief.model.dto.BeneficiaryDto;
 import kr.pe.aichief.model.dto.ClaimDto;
 import kr.pe.aichief.model.dto.ClaimRequest;
 import kr.pe.aichief.model.dto.ClaimResponse;
-import kr.pe.aichief.model.dto.ClaimResult;
 import kr.pe.aichief.model.dto.IdentificationDto;
 import kr.pe.aichief.model.dto.InsuredDto;
 import kr.pe.aichief.model.dto.RecognitionResult;
@@ -49,73 +52,97 @@ import kr.pe.aichief.model.repository.ManagerRepository;
 import kr.pe.aichief.util.DtoConverter;
 import kr.pe.aichief.util.ManagerComparator;
 import kr.pe.aichief.util.MyConverter;
-import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-@Service
-@RequiredArgsConstructor
-public class ClaimService {
+@Disabled
+@SpringBootTest
+public class ClaimServiceTest {
 
-	private final String requestBaseUrl = "http://3.34.231.50";
+	@Autowired
+	private ContractRepository contractRepository;
 
-	private final String requestUrl = "/controller/get-information/";
+	@Autowired
+	private ManagerRepository managerRepository;
 
-	private final ObjectMapper mapper;
+	@Autowired
+	private ClaimRepository claimRepository;
 
-	private final MyConverter myConverter;
+	@Autowired
+	private AssignRepository assignRepository;
 
-	private final DtoConverter dtoConverter;
+	@Autowired
+	private BeneficiaryRepository beneficiaryRepository;
+	
+	@Autowired
+	private IdentificationRepository identificationRepository;
+	
+	@Autowired
+	private AnotherSubscribeRepository anotherSubscribeRepository;
+	
+	@Autowired
+	private AccountRepository accountRepository;
+	
+	@Autowired
+	private AccidentRepository accidentRepository;
+	
+	@Autowired
+	private InsuredRepository insuredRepository;
 
-	private final ManagerComparator managerComparator;
+	@Autowired
+	private MyConverter myConverter;
 
-	private final ContractRepository contractRepository;
+	@Autowired
+	private DtoConverter dtoConverter;
 
-	private final ManagerRepository managerRepository;
+	@Autowired
+	private ManagerComparator managerComparator;
 
-	private final ClaimRepository claimRepository;
+	@Disabled
+	@Test
+	void callExternalApiTest() throws Exception {
 
-	private final AssignRepository assignRepository;
+		// 필요한 변수 초기화
+		Logger logger = LoggerFactory.getLogger(ClaimServiceTest.class);
 
-	private final BeneficiaryRepository beneficiaryRepository;
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 
-	private final IdentificationRepository identificationRepository;
+		String requestBaseUrl = "http://3.34.231.50";
+		String requestUrl = "/controller/get-information/";
 
-	private final AnotherSubscribeRepository anotherSubscribeRepository;
+		String testUser = "kang@test.com";
+		int testContractId = 2;
+		String testCompanyName = "samsung";
+		String testImagePath = "projects/images/samsung-11.jpg";
 
-	private final AccountRepository accountRepository;
+		// 1. 외부 API에 요청 - 응답
 
-	private final AccidentRepository accidentRepository;
+		// WebClinet 생성
+		WebClient webClient = WebClient.builder().baseUrl(requestBaseUrl)
+				.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).build();
 
-	private final InsuredRepository insuredRepository;
+		// Request 생성
+		ClaimRequest claimRequest = ClaimRequest.builder().user(testUser).contract_id(testContractId)
+				.company(testCompanyName).image_path(testImagePath).build();
 
-	public ClaimResult serveClaim(ClaimRequest claimRequest) throws JsonMappingException, JsonProcessingException {
-
-		// 1. API 요청
-
-		// 1-1. WebClient 생성
-		WebClient webClient = WebClient
-				.builder()
-				.baseUrl(requestBaseUrl)
-				.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-				.build();
-
-		// 1-2. 요청 및 응답
-		ClaimResponse claimResponse = webClient.post()
-				.uri(requestUrl)
-				.accept(MediaType.APPLICATION_JSON)
-				.body(Mono.just(claimRequest), ClaimRequest.class)
-				.retrieve()
-				.bodyToMono(ClaimResponse.class)
-				.share()
+		// 응답 받기
+		ClaimResponse claimResponse = webClient.post().uri(requestUrl).accept(MediaType.APPLICATION_JSON)
+				.body(Mono.just(claimRequest), ClaimRequest.class).retrieve().bodyToMono(ClaimResponse.class).share()
 				.block();
 
-		// 1-3. 인식 결과 객체로 변환
-		RecognitionResult recognitionResult = mapper.readValue(claimResponse.getResult().replaceAll("\'", "\""), RecognitionResult.class);
-		
-		// 2. 새로운 데이터 저장 및 기존 데이터 업데이트
+		// 응답에서 인식 결과 객체로 변환
+		ObjectMapper mapper = new ObjectMapper();
+		RecognitionResult recognitionResult = mapper.readValue(claimResponse.getResult().replaceAll("\'", "\""),
+				RecognitionResult.class);
 
+		logger.info("응답 결과: " + claimResponse.toString());
+		logger.info("인식 결과: " + claimResponse.getResult());
+		logger.info("Json to Object 변환 결과: " + recognitionResult.toString());
+
+		// 2. 새로운 데이터 저장 및 기존 데이터 업데이트
+		
 		// 2-1. identification, anotherSubscribe, account
-		Beneficiary savedBeneficiary = beneficiaryRepository.findByEmail(claimRequest.getUser())
+		Beneficiary savedBeneficiary = beneficiaryRepository.findByEmail(testUser)
 				.orElseThrow(() -> new EntityNotFoundException("Receive claim: Beneficiary not found"));
 
 		Identification identification = Identification.builder()
@@ -138,32 +165,37 @@ public class ClaimService {
 				.holder(myConverter.spaceJoiner(recognitionResult.getAccountHolder()))
 				.beneficiary(savedBeneficiary)
 				.build();
-
+		
 		identificationRepository.save(identification);
 		anotherSubscribeRepository.save(anotherSubscribe);
 		accountRepository.save(account);
-
+		
 		// 2-2. assign
 		List<Manager> savedManagers = managerRepository.findAll();
 		Collections.sort(savedManagers, managerComparator);
 		Manager savedManager = savedManagers.get(0);
 
-		Assign assign = Assign.builder().manager(savedManager).build();
-
+		Assign assign = Assign.builder()
+				.manager(savedManager)
+				.build();
+		
 		assignRepository.save(assign);
-
+		
 		// 2-3. claim
 		List<Assign> savedAssigns = assignRepository.findAllByOrderByAssignIdDesc();
 		Assign savedAssign = savedAssigns.get(0);
-
-		Claim claim = Claim.builder().date(LocalDate.now()).assign(savedAssign).build();
-
+		
+		Claim claim = Claim.builder()
+				.date(LocalDate.now())
+				.assign(savedAssign)
+				.build();
+		
 		claimRepository.save(claim);
-
+		
 		// 2-4. accident
 		List<Claim> savedClaims = claimRepository.findAllByOrderByClaimIdDesc();
 		Claim savedClaim = savedClaims.get(0);
-
+		
 		Accident accident = Accident.builder()
 				.location(myConverter.spaceJoiner(recognitionResult.getAccidentLocation()))
 				.details(myConverter.spaceJoiner(recognitionResult.getAccidentDetails()))
@@ -171,58 +203,66 @@ public class ClaimService {
 				.dateTime(LocalDateTime.now())
 				.claim(savedClaim)
 				.build();
-
-		accidentRepository.save(accident);
-
-		// 2-5. contract
-		Contract savedContract = contractRepository.findById(claimRequest.getContract_id())
-				.orElseThrow(() -> new EntityNotFoundException("Receive claim: Contract not found"));
 		
+		accidentRepository.save(accident);
+		
+		// 2-5. contract
+		Contract savedContract = contractRepository.findById(testContractId)
+				.orElseThrow(() -> new EntityNotFoundException("Receive claim: Contract not found"));
 		savedContract.setClaim(savedClaim);
 		contractRepository.save(savedContract);
 		
-		// 3. 반환 객체 구성
+		stopWatch.stop();
+
+		logger.info("최종 처리 시간: " + stopWatch.getTotalTimeSeconds());
+	}
+	
+	@Disabled
+	@Test
+	void serveClaimTest() {
 		
-		// 3-1. 청구
-		ClaimDto claimDto = dtoConverter.claimToDto(claimRepository.findByContract_ContractId(claimRequest.getContract_id())
-						.orElseThrow(() -> new EntityNotFoundException("Serve claim: Claim not found")));
-				
-		// 3-2. 피보험자
-		InsuredDto insuredDto = dtoConverter.insuredToDto(insuredRepository.findByBeneficiary_Email(claimRequest.getUser())
+		// given
+		String testUser = "kang@test.com";
+		int testContractId = 2;
+		
+		// 청구
+		ClaimDto claimDto = dtoConverter.claimToDto(claimRepository.findByContract_ContractId(testContractId)
+				.orElseThrow(() -> new EntityNotFoundException("Serve claim: Claim not found")));
+		
+		// 피보험자
+		InsuredDto insuredDto = dtoConverter.insuredToDto(insuredRepository.findByBeneficiary_Email(testUser)
 				.orElseThrow(() -> new EntityNotFoundException("Serve claim: Insured not found")));
-
-		// 3-3. 수익자
-		BeneficiaryDto beneficiaryDto = dtoConverter.beneficiaryToDto(beneficiaryRepository.findByEmail(claimRequest.getUser())
+		
+		// 수익자
+		BeneficiaryDto beneficiaryDto = dtoConverter.beneficiaryToDto(beneficiaryRepository.findByEmail(testUser)
 				.orElseThrow(() -> new EntityNotFoundException("Serve claim: Beneficiary not found")));
-
-		// 3-4. 신분증
+		
+		// 신분증
 		IdentificationDto identificationDto = dtoConverter.identificationToDto(identificationRepository
-				.findByBeneficiary_BeneficiaryId(Integer.parseInt(beneficiaryDto.getBeneficiaryId()))
-				.orElseThrow(() -> new EntityNotFoundException("Serve claim: Identification not found")));
-
-		// 3-5. 타사 가입
+						.findByBeneficiary_BeneficiaryId(Integer.parseInt(beneficiaryDto.getBeneficiaryId()))
+						.orElseThrow(() -> new EntityNotFoundException("Serve claim: Identification not found")));
+		
+		// 타사가입
 		AnotherSubscribeDto anotherSubscribeDto = dtoConverter.anotherSubscribeToDto(anotherSubscribeRepository
 				.findByBeneficiary_BeneficiaryId(Integer.parseInt(beneficiaryDto.getBeneficiaryId()))
 				.orElseThrow(() -> new EntityNotFoundException("Serve claim: AnotherSubscribe not found")));
-
-		// 3-6. 계좌
-		AccountDto accountDto = dtoConverter.accountToDto(
-				accountRepository.findByBeneficiary_BeneficiaryId(Integer.parseInt(beneficiaryDto.getBeneficiaryId()))
-						.orElseThrow(() -> new EntityNotFoundException("Serve claim: Account not found")));
-
-		// 3-7. 사고
-		AccidentDto accidentDto = dtoConverter.accidentToDto(accidentRepository.findByClaim_Contract_ContractId(claimRequest.getContract_id())
-						.orElseThrow(() -> new EntityNotFoundException("Serve claim: Accident not found")));
 		
-		// 4. 반환
-		return ClaimResult.builder()
-				.claim(claimDto)
-				.insured(insuredDto)
-				.beneficiary(beneficiaryDto)
-				.identification(identificationDto)
-				.anotherSubscribe(anotherSubscribeDto)
-				.account(accountDto)
-				.accident(accidentDto)
-				.build();
+		// 계좌
+		AccountDto accountDto = dtoConverter.accountToDto(accountRepository
+				.findByBeneficiary_BeneficiaryId(Integer.parseInt(beneficiaryDto.getBeneficiaryId()))
+				.orElseThrow(() -> new EntityNotFoundException("Serve claim: Account not found")));
+		
+		// 사고
+		AccidentDto accidentDto = dtoConverter.accidentToDto(accidentRepository.findByClaim_Contract_ContractId(testContractId)
+				.orElseThrow(() -> new EntityNotFoundException("Serve claim: Accident not found")));
+		
+		System.out.println(claimDto);
+		System.out.println(insuredDto);
+		System.out.println(beneficiaryDto);
+		System.out.println(identificationDto);
+		System.out.println(anotherSubscribeDto);
+		System.out.println(accountDto);
+		System.out.println(accidentDto);
+		
 	}
 }

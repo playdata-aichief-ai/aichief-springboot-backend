@@ -14,9 +14,9 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class BeneficiaryDto {
+public class InsuredDto {
 
-	private String beneficiaryId;
+	private String insuredId;
 	
 	private String name;
 	
@@ -29,11 +29,4 @@ public class BeneficiaryDto {
 	private String socialSecurityNumber;
 	
 	private String job;
-	
-	private String landline;
-	
-	private String address;
-	
-	private String relationshipWithInsured;
-	
 }

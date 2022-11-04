@@ -1,6 +1,7 @@
 package kr.pe.aichief.controller;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,21 @@ public class InfoController {
 		
 		result.setCode(HttpStatus.OK.value());
 		result.setHttpStatus(HttpStatus.OK);
-		result.setCount(1);
+		result.setCount(result.getContents().size());
+		result.setMessage("Request get info success");
+		
+		return ResponseEntity.status(result.getHttpStatus()).body(result);
+	}
+	
+	@GetMapping("/with_name")
+	public ResponseEntity<MyResponse> getInfoWithName(@RequestParam("name") String name) {
+		
+		MyResponse result = MyResponse.builder().contents(new ArrayList<Object>()).build();
+		
+		result.setContents(myPageService.getBeneficiaryWithName(name).stream().map(beneficiary -> (Object) beneficiary).collect(Collectors.toList()));
+		result.setCode(HttpStatus.OK.value());
+		result.setHttpStatus(HttpStatus.OK);
+		result.setCount(result.getContents().size());
 		result.setMessage("Request get info success");
 		
 		return ResponseEntity.status(result.getHttpStatus()).body(result);

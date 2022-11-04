@@ -1,17 +1,28 @@
 package kr.pe.aichief.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.stereotype.Component;
 
+import kr.pe.aichief.model.dto.AccidentDto;
+import kr.pe.aichief.model.dto.AccountDto;
+import kr.pe.aichief.model.dto.AnotherSubscribeDto;
+import kr.pe.aichief.model.dto.AssignDto;
 import kr.pe.aichief.model.dto.BeneficiaryDto;
 import kr.pe.aichief.model.dto.ClaimDto;
 import kr.pe.aichief.model.dto.ContractDto;
+import kr.pe.aichief.model.dto.IdentificationDto;
+import kr.pe.aichief.model.dto.InsuranceDto;
+import kr.pe.aichief.model.dto.InsuredDto;
 import kr.pe.aichief.model.dto.ManagerDto;
+import kr.pe.aichief.model.entity.Accident;
+import kr.pe.aichief.model.entity.Account;
+import kr.pe.aichief.model.entity.AnotherSubscribe;
+import kr.pe.aichief.model.entity.Assign;
 import kr.pe.aichief.model.entity.Beneficiary;
 import kr.pe.aichief.model.entity.Claim;
 import kr.pe.aichief.model.entity.Contract;
+import kr.pe.aichief.model.entity.Identification;
+import kr.pe.aichief.model.entity.Insurance;
+import kr.pe.aichief.model.entity.Insured;
 import kr.pe.aichief.model.entity.Manager;
 
 @Component
@@ -19,121 +30,117 @@ public class DtoConverter {
 
 	public BeneficiaryDto beneficiaryToDto(Beneficiary beneficiary) {
 
-		Map<String, String> beneMap = new HashMap<String, String>();
-
-		beneMap.put("beneficiaryId", Integer.toString(beneficiary.getBeneficiaryId()));
-		beneMap.put("email", beneficiary.getEmail());
-		beneMap.put("phoneNumber", beneficiary.getPhoneNumber());
-		beneMap.put("joinDate", beneficiary.getJoinDate().toString());
-		beneMap.put("job", beneficiary.getJob());
-		beneMap.put("landline", beneficiary.getLandline());
-		beneMap.put("address", beneficiary.getAddress());
-		beneMap.put("relationshipWithInsured", beneficiary.getRelationshipWithInsured());
-
-		return BeneficiaryDto.builder().beneficiary(beneMap).build();
+		return BeneficiaryDto.builder()
+				.beneficiaryId(Integer.toString(beneficiary.getBeneficiaryId()))
+				.name(beneficiary.getName())
+				.email(beneficiary.getEmail())
+				.phoneNumber(beneficiary.getPhoneNumber())
+				.joinDate(beneficiary.getJoinDate().toString())
+				.socialSecurityNumber(beneficiary.getSocialSecurityNumber())
+				.job(beneficiary.getJob())
+				.landline(beneficiary.getLandline())
+				.address(beneficiary.getAddress())
+				.relationshipWithInsured(beneficiary.getRelationshipWithInsured())
+				.build();
 	}
 
 	public ClaimDto claimToDto(Claim claim) {
 
-		Map<String, String> claMap = new HashMap<String, String>();
-
-		claMap.put("claimId", Integer.toString(claim.getClaimId()));
-		claMap.put("reasonForPartialClaim", claim.getReasonForPartialClaim());
-		claMap.put("date", claim.getDate().toString());
-
-		Map<String, String> insMap = new HashMap<String, String>();
-
-		insMap.put("insuredId", Integer.toString(claim.getContract().getInsured().getInsuredId()));
-		insMap.put("name", claim.getContract().getInsured().getName());
-		insMap.put("email", claim.getContract().getInsured().getEmail());
-		insMap.put("phoneNumber", claim.getContract().getInsured().getPhoneNumber());
-		insMap.put("joinDate", claim.getContract().getInsured().getJoinDate().toString());
-		insMap.put("job", claim.getContract().getInsured().getJob());
-
-		Map<String, String> benMap = new HashMap<String, String>();
-
-		benMap.put("beneficiaryId", Integer.toString(claim.getContract().getBeneficiary().getBeneficiaryId()));
-		benMap.put("name", claim.getContract().getBeneficiary().getName());
-		benMap.put("email", claim.getContract().getBeneficiary().getEmail());
-		benMap.put("phoneNumber", claim.getContract().getBeneficiary().getPhoneNumber());
-		benMap.put("joinDate", claim.getContract().getBeneficiary().getJoinDate().toString());
-		benMap.put("job", claim.getContract().getBeneficiary().getJob());
-		benMap.put("landline", claim.getContract().getBeneficiary().getLandline());
-		benMap.put("address", claim.getContract().getBeneficiary().getAddress());
-		benMap.put("relationshipWithInsured", claim.getContract().getBeneficiary().getRelationshipWithInsured());
-
-		Map<String, String> insuMap = new HashMap<String, String>();
-
-		insuMap.put("insuranceId", Integer.toString(claim.getContract().getInsurance().getInsuranceId()));
-		insuMap.put("companyName", claim.getContract().getInsurance().getCompanyName());
-		insuMap.put("details", claim.getContract().getInsurance().getDetails());
-
-		Map<String, String> accMap = new HashMap<String, String>();
-
-		accMap.put("accidentId", Integer.toString(claim.getAccident().getAccidentId()));
-		accMap.put("accidentDateTime", claim.getAccident().getDateTime().toString());
-		accMap.put("location", claim.getAccident().getLocation());
-		accMap.put("details", claim.getAccident().getDetails());
-		accMap.put("diseaseName", claim.getAccident().getDiseaseName());
-
-		return ClaimDto.builder().claim(claMap).insured(insMap).beneficiary(benMap).insurance(insuMap).accident(accMap)
+		return ClaimDto.builder()
+				.claimId(Integer.toString(claim.getClaimId()))
+				.reasonForPartialClaim(claim.getReasonForPartialClaim())
+				.date(claim.getDate().toString())
 				.build();
 
 	}
 
 	public ContractDto contractToDto(Contract contract) {
 
-		Map<String, String> conMap = new HashMap<String, String>();
-
-		conMap.put("contractId", Integer.toString(contract.getContractId()));
-		conMap.put("monthlyPremium", Float.toString(contract.getMonthlyPremium()));
-		conMap.put("state", contract.getState());
-
-		Map<String, String> insMap = new HashMap<String, String>();
-
-		insMap.put("insuredId", Integer.toString(contract.getInsured().getInsuredId()));
-		insMap.put("name", contract.getInsured().getName());
-		insMap.put("email", contract.getInsured().getEmail());
-		insMap.put("phoneNumber", contract.getInsured().getPhoneNumber());
-		insMap.put("joinDate", contract.getInsured().getJoinDate().toString());
-		insMap.put("job", contract.getInsured().getJob());
-
-		Map<String, String> benMap = new HashMap<String, String>();
-
-		benMap.put("beneficiaryId", Integer.toString(contract.getBeneficiary().getBeneficiaryId()));
-		benMap.put("name", contract.getBeneficiary().getName());
-		benMap.put("email", contract.getBeneficiary().getEmail());
-		benMap.put("phoneNumber", contract.getBeneficiary().getPhoneNumber());
-		benMap.put("joinDate", contract.getBeneficiary().getJoinDate().toString());
-		benMap.put("job", contract.getBeneficiary().getJob());
-		benMap.put("landline", contract.getBeneficiary().getLandline());
-		benMap.put("address", contract.getBeneficiary().getAddress());
-		benMap.put("relationshipWithInsured", contract.getBeneficiary().getRelationshipWithInsured());
-
-		Map<String, String> insuMap = new HashMap<String, String>();
-
-		insuMap.put("insuranceId", Integer.toString(contract.getInsurance().getInsuranceId()));
-		insuMap.put("companyName", contract.getInsurance().getCompanyName());
-		insuMap.put("details", contract.getInsurance().getDetails());
-		
 		return ContractDto.builder()
-				.contract(conMap)
-				.insured(insMap)
-				.beneficiary(benMap)
-				.insurance(insuMap)
+				.contractId(Integer.toString(contract.getContractId()))
+				.monthlyPremium(Float.toString(contract.getMonthlyPremium()))
+				.state(contract.getState())
 				.build();
 	}
 
 	public ManagerDto managerToDto(Manager manager) {
 
-		Map<String, String> manaMap = new HashMap<String, String>();
-
-		manaMap.put("managerId", Integer.toString(manager.getManagerId()));
-		manaMap.put("name", manager.getName());
-		manaMap.put("email", manager.getEmail());
-		manaMap.put("phoneNumber", manager.getPhoneNumber());
-		manaMap.put("joinDate", manager.getJoinDate().toString());
-
-		return ManagerDto.builder().manager(manaMap).build();
+		return ManagerDto.builder()
+				.managerId(Integer.toBinaryString(manager.getManagerId()))
+				.name(manager.getName())
+				.email(manager.getEmail())
+				.phoneNumber(manager.getPhoneNumber())
+				.joinDate(manager.getJoinDate().toString())
+				.build();
+	}
+	
+	public IdentificationDto identificationToDto(Identification iden) {
+		
+		return IdentificationDto.builder()
+				.identificationId(Integer.toString(iden.getIdentificationId()))
+				.number(iden.getNumber())
+				.serialNumber(iden.getSerialNumber())
+				.issueDate(iden.getIssueDate().toString())
+				.issueBy(iden.getIssueBy())
+				.build();
+	}
+	
+	public AnotherSubscribeDto anotherSubscribeToDto(AnotherSubscribe as) {
+		
+		return AnotherSubscribeDto.builder()
+				.anotherSubscribeId(Integer.toString(as.getAnotherSubscribeId()))
+				.companyName(as.getCompanyName())
+				.number(Integer.toString(as.getNumber()))
+				.build();
+	}
+	
+	public AccountDto accountToDto(Account acc) {
+		
+		return AccountDto.builder()
+				.accountId(Integer.toString(acc.getAccountId()))
+				.bankName(acc.getBankName())
+				.number(acc.getNumber())
+				.holder(acc.getHolder())
+				.build();
+	}
+	
+	public InsuredDto insuredToDto(Insured ins) {
+		
+		return InsuredDto.builder()
+				.insuredId(Integer.toString(ins.getInsuredId()))
+				.name(ins.getName())
+				.email(ins.getEmail())
+				.phoneNumber(ins.getPhoneNumber())
+				.joinDate(ins.getJoinDate().toString())
+				.socialSecurityNumber(ins.getSocialSecurityNumber())
+				.job(ins.getJob())
+				.build();
+	}
+	
+	public InsuranceDto insuranceToDto(Insurance ins) {
+		
+		return InsuranceDto.builder()
+				.insuranceId(Integer.toString(ins.getInsuranceId()))
+				.companyName(ins.getCompanyName())
+				.details(ins.getDetails())
+				.build();
+	}
+	
+	public AccidentDto accidentToDto(Accident acc) {
+		
+		return AccidentDto.builder()
+				.accidentId(Integer.toString(acc.getAccidentId()))
+				.dateTime(acc.getDateTime().toString())
+				.location(acc.getLocation())
+				.details(acc.getDetails())
+				.diseaseName(acc.getDiseaseName())
+				.build();
+	}
+	
+	public AssignDto assignToDto(Assign ass) {
+		
+		return AssignDto.builder()
+				.assignId(Integer.toString(ass.getAssignId()))
+				.build();
 	}
 }
