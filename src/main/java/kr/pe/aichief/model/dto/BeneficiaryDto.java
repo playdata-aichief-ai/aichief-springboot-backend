@@ -36,4 +36,5 @@ public class BeneficiaryDto {
 	
 	private String relationshipWithInsured;
 	
+	private String role;
 }

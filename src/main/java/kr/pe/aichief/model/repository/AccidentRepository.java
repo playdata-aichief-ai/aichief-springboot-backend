@@ -12,4 +12,6 @@ public interface AccidentRepository extends JpaRepository<Accident, Integer> {
 	List<Accident> findAllByOrderByAccidentIdDesc();
 	
 	Optional<Accident> findByClaim_Contract_ContractId(int id);
+	
+	Optional<Accident> findByClaim_ClaimId(int id);
 }

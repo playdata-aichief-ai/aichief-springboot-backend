@@ -16,4 +16,6 @@ public interface BeneficiaryRepository extends JpaRepository<Beneficiary, Intege
 	
 	@EntityGraph(value = "Beneficiary.anotherSubscribes")
 	Optional<Beneficiary> findByBeneficiaryId(int id);
+	
+	Optional<Beneficiary> findByContracts_ContractId(int id);
 }

@@ -1,5 +1,7 @@
 package kr.pe.aichief.util;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
 import kr.pe.aichief.model.dto.AccidentDto;
@@ -37,10 +39,10 @@ public class DtoConverter {
 				.phoneNumber(beneficiary.getPhoneNumber())
 				.joinDate(beneficiary.getJoinDate().toString())
 				.socialSecurityNumber(beneficiary.getSocialSecurityNumber())
-				.job(beneficiary.getJob())
-				.landline(beneficiary.getLandline())
+				.job(Optional.ofNullable(beneficiary.getJob()).orElse("-"))
+				.landline(Optional.ofNullable(beneficiary.getLandline()).orElse("-"))
 				.address(beneficiary.getAddress())
-				.relationshipWithInsured(beneficiary.getRelationshipWithInsured())
+				.relationshipWithInsured(Optional.ofNullable(beneficiary.getRelationshipWithInsured()).orElse("-"))
 				.build();
 	}
 
@@ -48,19 +50,24 @@ public class DtoConverter {
 
 		return ClaimDto.builder()
 				.claimId(Integer.toString(claim.getClaimId()))
-				.reasonForPartialClaim(claim.getReasonForPartialClaim())
+				.reasonForPartialClaim(Optional.ofNullable(claim.getReasonForPartialClaim()).orElse("-"))
 				.date(claim.getDate().toString())
 				.build();
 
 	}
 
 	public ContractDto contractToDto(Contract contract) {
-
-		return ContractDto.builder()
+		
+		ContractDto dto = ContractDto.builder()
 				.contractId(Integer.toString(contract.getContractId()))
-				.monthlyPremium(Float.toString(contract.getMonthlyPremium()))
-				.state(contract.getState())
+				.state(Optional.ofNullable(contract.getState()).orElse("-"))
 				.build();
+		
+		if(!Optional.ofNullable(contract.getMonthlyPremium()).isEmpty()) {
+			dto.setMonthlyPremium(Float.toString(contract.getMonthlyPremium()));
+		}
+
+		return dto;
 	}
 
 	public ManagerDto managerToDto(Manager manager) {
@@ -76,13 +83,18 @@ public class DtoConverter {
 	
 	public IdentificationDto identificationToDto(Identification iden) {
 		
-		return IdentificationDto.builder()
+		IdentificationDto dto = IdentificationDto.builder()
 				.identificationId(Integer.toString(iden.getIdentificationId()))
 				.number(iden.getNumber())
-				.serialNumber(iden.getSerialNumber())
-				.issueDate(iden.getIssueDate().toString())
-				.issueBy(iden.getIssueBy())
+				.serialNumber(Optional.ofNullable(iden.getSerialNumber()).orElse("-"))
+				.issueBy(Optional.ofNullable(iden.getIssueBy()).orElse("-"))
 				.build();
+		
+		if(!Optional.ofNullable(iden.getIssueDate()).isEmpty()) {
+			dto.setIssueDate(iden.getIssueDate().toString());
+		}
+		
+		return dto;
 	}
 	
 	public AnotherSubscribeDto anotherSubscribeToDto(AnotherSubscribe as) {
@@ -90,7 +102,7 @@ public class DtoConverter {
 		return AnotherSubscribeDto.builder()
 				.anotherSubscribeId(Integer.toString(as.getAnotherSubscribeId()))
 				.companyName(as.getCompanyName())
-				.number(Integer.toString(as.getNumber()))
+				.number(Integer.toString(Optional.ofNullable(as.getNumber()).orElse(0)))
 				.build();
 	}
 	
@@ -113,7 +125,7 @@ public class DtoConverter {
 				.phoneNumber(ins.getPhoneNumber())
 				.joinDate(ins.getJoinDate().toString())
 				.socialSecurityNumber(ins.getSocialSecurityNumber())
-				.job(ins.getJob())
+				.job(Optional.ofNullable(ins.getJob()).orElse("-"))
 				.build();
 	}
 	
@@ -122,7 +134,7 @@ public class DtoConverter {
 		return InsuranceDto.builder()
 				.insuranceId(Integer.toString(ins.getInsuranceId()))
 				.companyName(ins.getCompanyName())
-				.details(ins.getDetails())
+				.details(Optional.ofNullable(ins.getDetails()).orElse("-"))
 				.build();
 	}
 	
@@ -131,9 +143,9 @@ public class DtoConverter {
 		return AccidentDto.builder()
 				.accidentId(Integer.toString(acc.getAccidentId()))
 				.dateTime(acc.getDateTime().toString())
-				.location(acc.getLocation())
+				.location(Optional.ofNullable(acc.getLocation()).orElse("-"))
 				.details(acc.getDetails())
-				.diseaseName(acc.getDiseaseName())
+				.diseaseName(Optional.ofNullable(acc.getDiseaseName()).orElse("-"))
 				.build();
 	}
 	
