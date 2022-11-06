@@ -25,4 +25,6 @@ public class ManagerDto {
 	private String phoneNumber;
 	
 	private String joinDate;
+	
+	private String role;
 }

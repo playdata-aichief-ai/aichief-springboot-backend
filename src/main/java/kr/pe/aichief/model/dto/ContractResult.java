@@ -10,27 +10,18 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
 @Setter
+@Getter
 @ToString
 
-public class ClaimResult {
-
-	private ClaimDto claim;
+public class ContractResult {
+	
+	private ContractDto contract;
 	
 	private InsuredDto insured;
 	
 	private BeneficiaryDto beneficiary;
 	
-	private IdentificationDto identification;
-	
-	private AnotherSubscribeDto anotherSubscribe;
-	
-	private AccountDto account;
-	
-	private AccidentDto accident;
-	
-	private ContractDto contract;
-	
 	private InsuranceDto insurance;
+
 }
