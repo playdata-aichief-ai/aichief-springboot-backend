@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -87,6 +88,8 @@ public class ClaimService {
 	private final AccidentRepository accidentRepository;
 
 	private final InsuredRepository insuredRepository;
+	
+	private final AccidentService accidentService;
 
 	public ClaimResult serveClaim(ClaimRequest claimRequest) throws JsonMappingException, JsonProcessingException {
 
@@ -224,5 +227,30 @@ public class ClaimService {
 				.account(accountDto)
 				.accident(accidentDto)
 				.build();
+	}
+	
+	public Optional<Claim> getClaim(int claimId) throws JsonMappingException, JsonProcessingException {
+		return claimRepository.findByContract_ContractId(claimId);
+	}
+	
+	public boolean updateClaim(int claimId, ClaimResult updateInfo) throws JsonMappingException, JsonProcessingException {
+		try {
+			Accident accidentInfoBefore = accidentService.getAccidentByClaimId(claimId).get();
+			System.out.println(accidentInfoBefore);
+			
+			ClaimResult claimInfoUpdate = updateInfo;
+			AccidentDto accidentInfoUpdate = claimInfoUpdate.getAccident();
+			System.out.println(accidentInfoUpdate);
+			
+			accidentInfoBefore.setLocation(accidentInfoUpdate.getLocation());
+			accidentInfoBefore.setDetails(accidentInfoUpdate.getDetails());
+			accidentInfoBefore.setDiseaseName(accidentInfoUpdate.getDiseaseName());
+			System.out.println(accidentInfoBefore);
+			accidentRepository.save(accidentInfoBefore);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+		
 	}
 }
