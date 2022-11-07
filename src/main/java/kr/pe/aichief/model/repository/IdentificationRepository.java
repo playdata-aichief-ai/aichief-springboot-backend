@@ -11,5 +11,7 @@ public interface IdentificationRepository extends JpaRepository<Identification, 
 
 	Optional<Identification> findByBeneficiary_BeneficiaryId(int id);
 	
+	Optional<Identification> findByBeneficiary_Contracts_Claim_ClaimId(int id);
+	
 	List<Identification> findAllByOrderByIdentificationIdDesc();
 }

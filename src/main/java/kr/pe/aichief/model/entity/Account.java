@@ -41,6 +41,6 @@ public class Account {
 	
 	@ToString.Exclude
 	@OneToOne
-	@JoinColumn(name = "beneficiary_id", unique = true)
+	@JoinColumn(name = "beneficiary_id")
 	private Beneficiary beneficiary;
 }

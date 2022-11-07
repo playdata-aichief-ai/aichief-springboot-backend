@@ -16,4 +16,6 @@ public interface ClaimRepository extends JpaRepository<Claim, Integer> {
 	Optional<Claim> findByContract_ContractId(int contractId);
 	
 	List<Claim> findAllByOrderByClaimIdDesc();
+	
+	Optional<Claim> findByContract_Claim_ClaimId(int id);
 }

@@ -2,7 +2,6 @@ package kr.pe.aichief.model.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -18,12 +17,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import kr.pe.aichief.exceptions.InvalidInputException;
 import kr.pe.aichief.model.dto.AccidentDto;
 import kr.pe.aichief.model.dto.AccountDto;
 import kr.pe.aichief.model.dto.AnotherSubscribeDto;
 import kr.pe.aichief.model.dto.BeneficiaryDto;
 import kr.pe.aichief.model.dto.ClaimDto;
-import kr.pe.aichief.model.dto.ClaimRequest;
+import kr.pe.aichief.model.dto.ClaimPostRequest;
+import kr.pe.aichief.model.dto.ClaimPutRequest;
 import kr.pe.aichief.model.dto.ClaimResponse;
 import kr.pe.aichief.model.dto.ClaimResult;
 import kr.pe.aichief.model.dto.IdentificationDto;
@@ -90,9 +91,7 @@ public class ClaimService {
 
 	private final InsuredRepository insuredRepository;
 	
-	private final AccidentService accidentService;
-
-	public ClaimResult serveClaim(ClaimRequest claimRequest) throws JsonMappingException, JsonProcessingException {
+	public ClaimResult serveClaim(ClaimPostRequest claimRequest) throws JsonMappingException, JsonProcessingException {
 
 		// 1. API 요청
 
@@ -107,7 +106,7 @@ public class ClaimService {
 		ClaimResponse claimResponse = webClient.post()
 				.uri(requestUrl)
 				.accept(MediaType.APPLICATION_JSON)
-				.body(Mono.just(claimRequest), ClaimRequest.class)
+				.body(Mono.just(claimRequest), ClaimPostRequest.class)
 				.retrieve()
 				.bodyToMono(ClaimResponse.class)
 				.share()
@@ -230,50 +229,85 @@ public class ClaimService {
 				.build();
 	}
 	
-	public Optional<Claim> getClaim(int claimId) throws JsonMappingException, JsonProcessingException {
-		return claimRepository.findByContract_ContractId(claimId);
+	public void updateClaim(ClaimPutRequest claimRequest) 
+			throws JsonMappingException, JsonProcessingException, InvalidInputException {
+		
+		// 1. 수정하려는 신분증, 타사가입, 계좌, 사고 조회
+		
+		// 1-1. 신분증
+		Identification identificationBefore = identificationRepository.findByBeneficiary_Contracts_Claim_ClaimId(claimRequest.getClaimId())
+				.orElseThrow(() -> new EntityNotFoundException("Update claim: Identification not found"));
+		
+		// 1-2. 타사가입
+		AnotherSubscribe anotherSubscribeBefore = anotherSubscribeRepository.findByBeneficiary_Contracts_Claim_ClaimId(claimRequest.getClaimId())
+				.orElseThrow(() -> new EntityNotFoundException("Update claim: AnotherSubscribe not found"));
+		
+		// 1-3. 계좌
+		Account accountBefore = accountRepository.findByBeneficiary_Contracts_Claim_ClaimId(claimRequest.getClaimId())
+				.orElseThrow(() -> new EntityNotFoundException("Update claim: Account not found"));
+		
+		// 1-4. 사고
+		Accident accidentBefore = accidentRepository.findByClaim_ClaimId(claimRequest.getClaimId())
+				.orElseThrow(() -> new EntityNotFoundException("Update claim: Accident not found"));
+		
+		// 2. 신분증, 타사가입, 계좌, 사고 수정
+		
+		// 2-1. 신분증
+		identificationBefore.setNumber(claimRequest.getIdentification().getNumber());
+		identificationBefore.setSerialNumber(claimRequest.getIdentification().getSerialNumber());
+		identificationBefore.setIssueDate(LocalDate.parse(Optional.ofNullable(claimRequest.getIdentification().getIssueDate())
+				.orElseThrow(() -> new InvalidInputException("Update claim: Value cant be null"))));
+		identificationBefore.setIssueBy(claimRequest.getIdentification().getIssueBy());
+		
+		// 2-2. 타사가입
+		anotherSubscribeBefore.setCompanyName(claimRequest.getAnotherSubscribe().getCompanyName());
+		anotherSubscribeBefore.setNumber(Integer.parseInt(Optional.ofNullable(claimRequest.getAnotherSubscribe().getNumber())
+				.orElseThrow(() -> new InvalidInputException("Update claim: Value cant be null"))));
+		
+		// 2-3. 계좌
+		accountBefore.setBankName(claimRequest.getAccount().getBankName());
+		accountBefore.setNumber(claimRequest.getAccount().getNumber());
+		accountBefore.setHolder(claimRequest.getAccount().getHolder());
+		
+		// 2-4. 사고
+		accidentBefore.setLocation(claimRequest.getAccident().getLocation());
+		accidentBefore.setDetails(claimRequest.getAccident().getDetails());
+		accidentBefore.setDiseaseName(claimRequest.getAccident().getDiseaseName());
+		accidentBefore.setDateTime(LocalDateTime.parse(Optional.ofNullable(claimRequest.getAccident().getDateTime())
+				.orElseThrow(() -> new InvalidInputException("Update claim: Value cant be null"))));
+		
+		// 3. 업데이트
+		identificationRepository.save(identificationBefore);
+		anotherSubscribeRepository.save(anotherSubscribeBefore);
+		accountRepository.save(accountBefore);
+		accidentRepository.save(accidentBefore);
 	}
 	
-	public boolean updateClaim(int claimId, ClaimResult updateInfo) throws JsonMappingException, JsonProcessingException {
-		try {
-			Accident accidentInfoBefore = accidentService.getAccidentByClaimId(claimId).get();
-			int beneficiaryId = contractRepository.findByClaim_ClaimId(claimId).get().getBeneficiary().getBeneficiaryId();
-			AnotherSubscribe anotherSubscribeInfoBefore = anotherSubscribeRepository.findByBeneficiary_BeneficiaryId(beneficiaryId).get();
-			Identification IdentificationInfoBefore = identificationRepository.findByBeneficiary_BeneficiaryId(beneficiaryId).get();
-			Account accountInfoBefore = accountRepository.findByBeneficiary_BeneficiaryId(beneficiaryId).get();
-			
-			ClaimResult claimInfoUpdate = updateInfo;
-			AccidentDto accidentInfoUpdate = claimInfoUpdate.getAccident();
-			AnotherSubscribeDto anotherSubscribeInfoUpdate = claimInfoUpdate.getAnotherSubscribe();
-			IdentificationDto identificationInfoUpdate = claimInfoUpdate.getIdentification();
-			AccountDto accountInfoUpdate = claimInfoUpdate.getAccount();
-			
-			accidentInfoBefore.setLocation(accidentInfoUpdate.getLocation());
-			accidentInfoBefore.setDetails(accidentInfoUpdate.getDetails());
-			accidentInfoBefore.setDiseaseName(accidentInfoUpdate.getDiseaseName());
-			
-			anotherSubscribeInfoBefore.setCompanyName(anotherSubscribeInfoUpdate.getCompanyName());
-			anotherSubscribeInfoBefore.setNumber(Integer.parseInt(anotherSubscribeInfoUpdate.getNumber()));
-			
-			IdentificationInfoBefore.setNumber(identificationInfoUpdate.getNumber());
-			IdentificationInfoBefore.setSerialNumber(identificationInfoUpdate.getSerialNumber());
-			System.out.println("??");
-			IdentificationInfoBefore.setIssueDate(LocalDate.parse(identificationInfoUpdate.getIssueDate(), DateTimeFormatter.ISO_DATE));
-			System.out.println("??");
-			IdentificationInfoBefore.setIssueBy(identificationInfoUpdate.getIssueBy());
-			
-			accountInfoBefore.setBankName(accountInfoUpdate.getBankName());
-			accountInfoBefore.setNumber(accountInfoUpdate.getNumber());
-			accountInfoBefore.setHolder(accountInfoUpdate.getHolder());
-			
-			accidentRepository.save(accidentInfoBefore);
-			anotherSubscribeRepository.save(anotherSubscribeInfoBefore);
-			identificationRepository.save(IdentificationInfoBefore);
-			accountRepository.save(accountInfoBefore);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
+	public void deleteClaim(int id) {
 		
+		// 삭제 전 조회
+		Beneficiary beneficiaryBefore = beneficiaryRepository.findByContracts_Claim_ClaimId(id)
+				.orElseThrow(() -> new EntityNotFoundException("Delete claim: Beneficiary not found"));
+		Identification identificationBefore = identificationRepository.findByBeneficiary_Contracts_Claim_ClaimId(id)
+				.orElseThrow(() -> new EntityNotFoundException("Delete claim: Identification not found"));
+		AnotherSubscribe anotherSubscribeBefore = anotherSubscribeRepository
+				.findByBeneficiary_Contracts_Claim_ClaimId(id)
+				.orElseThrow(() -> new EntityNotFoundException("Delete claim: AnotherSubscribe not found"));
+		Account accountBefore = accountRepository.findByBeneficiary_Contracts_Claim_ClaimId(id)
+				.orElseThrow(() -> new EntityNotFoundException("Delete claim: Account not found"));
+		Assign assignBefore = assignRepository.findByClaim_ClaimId(id)
+				.orElseThrow(() -> new EntityNotFoundException("Delete claim: Assign not found"));
+		Claim claimBefore = claimRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Delete claim: Claim not found"));
+
+		// 삭제
+		beneficiaryBefore.setIdentification(null);
+		beneficiaryBefore.setAccount(null);
+		
+		identificationRepository.delete((identificationBefore));
+		anotherSubscribeRepository.delete(anotherSubscribeBefore);
+		accountRepository.delete(accountBefore);
+		assignRepository.delete(assignBefore);
+		claimRepository.delete(claimBefore);
 	}
 }

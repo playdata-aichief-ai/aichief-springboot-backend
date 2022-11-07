@@ -18,4 +18,6 @@ public interface BeneficiaryRepository extends JpaRepository<Beneficiary, Intege
 	Optional<Beneficiary> findByBeneficiaryId(int id);
 	
 	Optional<Beneficiary> findByContracts_ContractId(int id);
+	
+	Optional<Beneficiary> findByContracts_Claim_ClaimId(int id);
 }
