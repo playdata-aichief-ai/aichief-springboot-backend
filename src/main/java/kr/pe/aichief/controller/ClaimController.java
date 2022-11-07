@@ -6,7 +6,9 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import kr.pe.aichief.model.dto.ClaimRequest;
+import kr.pe.aichief.model.dto.ClaimResult;
 import kr.pe.aichief.model.dto.MyResponse;
 import kr.pe.aichief.model.service.ClaimService;
 import kr.pe.aichief.model.service.MyPageService;
@@ -64,5 +67,21 @@ public class ClaimController {
 		result.setMessage("Request GET All Claims Success");
 		
 		return ResponseEntity.status(result.getHttpStatus()).body(result);
+	}
+	
+	@PostMapping("/{claimIdx}")
+	public ResponseEntity<MyResponse> updateClaim(@PathVariable("claimIdx") int claimId, @RequestBody ClaimResult claimResult) throws JsonMappingException, JsonProcessingException {
+		MyResponse result = MyResponse.builder().contents(new ArrayList<Object>()).build();
+		if(claimService.updateClaim(claimId, claimResult)) {
+			result.setCode(HttpStatus.OK.value());
+			result.setHttpStatus(HttpStatus.OK);
+			result.setMessage("Request POST Claim Update Success");
+			return ResponseEntity.status(result.getHttpStatus()).body(result);
+		}else{
+			result.setCode(HttpStatus.NOT_FOUND.value());
+			result.setHttpStatus(HttpStatus.BAD_REQUEST);
+			result.setMessage("BAD REQUEST");
+			return ResponseEntity.status(result.getHttpStatus()).body(result);
+		}
 	}
 }
