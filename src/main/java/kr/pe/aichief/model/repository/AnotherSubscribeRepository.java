@@ -11,5 +11,7 @@ public interface AnotherSubscribeRepository extends JpaRepository<AnotherSubscri
 
 	Optional<AnotherSubscribe> findByBeneficiary_BeneficiaryId(int id);
 	
+	Optional<AnotherSubscribe> findByBeneficiary_Contracts_Claim_ClaimId(int id);
+	
 	List<AnotherSubscribe> findAllByOrderByAnotherSubscribeIdDesc();
 }

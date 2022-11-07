@@ -13,4 +13,6 @@ public interface InsuredRepository extends JpaRepository<Insured, Integer> {
 	Optional<Insured> findByBeneficiary_Email(String email);
 	
 	Optional<Insured> findByContracts_ContractId(int id);
+	
+	Optional<Insured> findByContracts_Claim_ClaimId(int id);
 }

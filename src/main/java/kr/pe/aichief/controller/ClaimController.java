@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import kr.pe.aichief.model.dto.ClaimRequest;
-import kr.pe.aichief.model.dto.ClaimResult;
+import kr.pe.aichief.exceptions.InvalidInputException;
+import kr.pe.aichief.model.dto.ClaimPostRequest;
+import kr.pe.aichief.model.dto.ClaimPutRequest;
 import kr.pe.aichief.model.dto.MyResponse;
 import kr.pe.aichief.model.service.ClaimService;
 import kr.pe.aichief.model.service.MyPageService;
@@ -34,7 +36,7 @@ public class ClaimController {
 	private final ClaimService claimService;
 	
 	@PostMapping
-	public ResponseEntity<MyResponse> receiveClaim(@RequestBody ClaimRequest claimRequset) throws JsonMappingException, JsonProcessingException {
+	public ResponseEntity<MyResponse> receiveClaim(@RequestBody ClaimPostRequest claimRequset) throws JsonMappingException, JsonProcessingException {
 		
 		MyResponse result = MyResponse.builder().contents(new ArrayList<Object>()).build();
 		
@@ -69,19 +71,30 @@ public class ClaimController {
 		return ResponseEntity.status(result.getHttpStatus()).body(result);
 	}
 	
-	@PostMapping("/{claimIdx}")
-	public ResponseEntity<MyResponse> updateClaim(@PathVariable("claimIdx") int claimId, @RequestBody ClaimResult claimResult) throws JsonMappingException, JsonProcessingException {
+	@PutMapping
+	public ResponseEntity<MyResponse> updateClaim(@RequestBody ClaimPutRequest claimRequest) 
+			throws JsonMappingException, JsonProcessingException, InvalidInputException {
+		
 		MyResponse result = MyResponse.builder().contents(new ArrayList<Object>()).build();
-		if(claimService.updateClaim(claimId, claimResult)) {
-			result.setCode(HttpStatus.OK.value());
-			result.setHttpStatus(HttpStatus.OK);
-			result.setMessage("Request POST Claim Update Success");
-			return ResponseEntity.status(result.getHttpStatus()).body(result);
-		}else{
-			result.setCode(HttpStatus.NOT_FOUND.value());
-			result.setHttpStatus(HttpStatus.BAD_REQUEST);
-			result.setMessage("BAD REQUEST");
-			return ResponseEntity.status(result.getHttpStatus()).body(result);
-		}
+		
+		claimService.updateClaim(claimRequest);
+		
+		result.setCode(HttpStatus.OK.value());
+		result.setHttpStatus(HttpStatus.OK);
+		result.setMessage("Request PUT Claim Success");
+		return ResponseEntity.status(result.getHttpStatus()).body(result);
+	}
+	
+	@DeleteMapping("/{claimId}")
+	public ResponseEntity<MyResponse> deleteClaim(@PathVariable("claimId") int claimId) {
+		
+		MyResponse result = MyResponse.builder().contents(new ArrayList<Object>()).build();
+		
+		claimService.deleteClaim(claimId);
+		
+		result.setCode(HttpStatus.OK.value());
+		result.setHttpStatus(HttpStatus.OK);
+		result.setMessage("Request DELETE Claim Success");
+		return ResponseEntity.status(result.getHttpStatus()).body(result);
 	}
 }

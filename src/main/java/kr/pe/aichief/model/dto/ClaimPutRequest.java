@@ -14,13 +14,15 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class ClaimRequest {
+public class ClaimPutRequest {
 	
-	private String user;
+	private int claimId;
+
+	private IdentificationDto identification;
 	
-	private int contract_id;
+	private AnotherSubscribeDto anotherSubscribe;
 	
-	private String company;
+	private AccountDto account;
 	
-	private String image_path;
+	private AccidentDto accident;
 }

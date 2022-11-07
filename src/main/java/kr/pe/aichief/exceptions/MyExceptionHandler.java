@@ -1,5 +1,6 @@
 package kr.pe.aichief.exceptions;
 
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 import javax.persistence.EntityNotFoundException;
@@ -37,6 +38,20 @@ public class MyExceptionHandler {
 		MyResponse result = MyResponse.builder()
 				.code(HttpStatus.SERVICE_UNAVAILABLE.value())
 				.httpStatus(HttpStatus.SERVICE_UNAVAILABLE)
+				.count(0)
+				.message(e.getMessage())
+				.contents(new ArrayList<Object>())
+				.build();
+		
+		return ResponseEntity.status(result.getHttpStatus()).body(result);
+	}
+	
+	@ExceptionHandler({InvalidInputException.class, NumberFormatException.class, DateTimeParseException.class})
+	public ResponseEntity<MyResponse> invalidInputHandler(Exception e) {
+		
+		MyResponse result = MyResponse.builder()
+				.code(HttpStatus.BAD_REQUEST.value())
+				.httpStatus(HttpStatus.BAD_REQUEST)
 				.count(0)
 				.message(e.getMessage())
 				.contents(new ArrayList<Object>())

@@ -1,11 +1,16 @@
 package kr.pe.aichief.model.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,9 +28,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.pe.aichief.model.dto.AccidentDto;
 import kr.pe.aichief.model.dto.AccountDto;
 import kr.pe.aichief.model.dto.AnotherSubscribeDto;
+import kr.pe.aichief.model.dto.AssignDto;
 import kr.pe.aichief.model.dto.BeneficiaryDto;
 import kr.pe.aichief.model.dto.ClaimDto;
-import kr.pe.aichief.model.dto.ClaimRequest;
+import kr.pe.aichief.model.dto.ClaimPostRequest;
 import kr.pe.aichief.model.dto.ClaimResponse;
 import kr.pe.aichief.model.dto.IdentificationDto;
 import kr.pe.aichief.model.dto.InsuredDto;
@@ -97,6 +103,7 @@ public class ClaimServiceTest {
 	@Autowired
 	private ManagerComparator managerComparator;
 
+	// 텍스트 인식 API 요청 및 응답 테스트
 	@Disabled
 	@Test
 	void callExternalApiTest() throws Exception {
@@ -122,12 +129,12 @@ public class ClaimServiceTest {
 				.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).build();
 
 		// Request 생성
-		ClaimRequest claimRequest = ClaimRequest.builder().user(testUser).contract_id(testContractId)
+		ClaimPostRequest claimRequest = ClaimPostRequest.builder().user(testUser).contract_id(testContractId)
 				.company(testCompanyName).image_path(testImagePath).build();
 
 		// 응답 받기
 		ClaimResponse claimResponse = webClient.post().uri(requestUrl).accept(MediaType.APPLICATION_JSON)
-				.body(Mono.just(claimRequest), ClaimRequest.class).retrieve().bodyToMono(ClaimResponse.class).share()
+				.body(Mono.just(claimRequest), ClaimPostRequest.class).retrieve().bodyToMono(ClaimResponse.class).share()
 				.block();
 
 		// 응답에서 인식 결과 객체로 변환
@@ -217,6 +224,7 @@ public class ClaimServiceTest {
 		logger.info("최종 처리 시간: " + stopWatch.getTotalTimeSeconds());
 	}
 	
+	// 청구 접수 요청 시 응답 구성 테스트
 	@Disabled
 	@Test
 	void serveClaimTest() {
@@ -264,5 +272,86 @@ public class ClaimServiceTest {
 		System.out.println(accountDto);
 		System.out.println(accidentDto);
 		
+	}
+	
+	// 청구 삭제 테스트
+	@Disabled
+	@Test
+	@Transactional
+	void deleteClaimTest() {
+		
+		int id = 19;
+		
+		// 삭제 전 연관 데이터 전체 조회
+		List<AssignDto> assignDtosBefore = assignRepository.findAll().stream().map(assign -> dtoConverter.assignToDto(assign)).collect(Collectors.toList());
+		List<AccidentDto> accidentDtosBefore = accidentRepository.findAll().stream().map(acc -> dtoConverter.accidentToDto(acc)).collect(Collectors.toList());
+		List<ClaimDto> claimDtosBefore = claimRepository.findAll().stream().map(claim -> dtoConverter.claimToDto(claim)).collect(Collectors.toList());
+		List<IdentificationDto> identificationDtosBefore = identificationRepository.findAll().stream().map(ide -> dtoConverter.identificationToDto(ide)).collect(Collectors.toList());
+		List<AnotherSubscribeDto> anotherSubscribeDtosBefore = anotherSubscribeRepository.findAll().stream().map(as -> dtoConverter.anotherSubscribeToDto(as)).collect(Collectors.toList());
+		List<AccountDto> accountDtosBefore = accountRepository.findAll().stream().map(acc -> dtoConverter.accountToDto(acc)).collect(Collectors.toList());
+		
+		assignDtosBefore.forEach(ass -> System.out.println(ass));
+		accidentDtosBefore.forEach(acc -> System.out.println(acc));
+		claimDtosBefore.forEach(cla -> System.out.println(cla));
+		identificationDtosBefore.forEach(ide -> System.out.println(ide));
+		anotherSubscribeDtosBefore.forEach(as -> System.out.println(as));
+		accountDtosBefore.forEach(acc -> System.out.println(acc));
+		
+		// 삭제 전 조회
+		Beneficiary beneficiaryBefore = beneficiaryRepository.findByContracts_Claim_ClaimId(id)
+				.orElseThrow(() -> new EntityNotFoundException("Delete claim test: Beneficiary not found"));
+		Identification identificationBefore = identificationRepository.findByBeneficiary_Contracts_Claim_ClaimId(id)
+				.orElseThrow(() -> new EntityNotFoundException("Delete claim test: Identification not found"));
+		AnotherSubscribe anotherSubscribeBefore = anotherSubscribeRepository.findByBeneficiary_Contracts_Claim_ClaimId(id)
+				.orElseThrow(() -> new EntityNotFoundException("Delete claim test: AnotherSubscribe not found"));
+		Account accountBefore = accountRepository.findByBeneficiary_Contracts_Claim_ClaimId(id)
+				.orElseThrow(() -> new EntityNotFoundException("Delete claim test: Account not found"));
+		Assign assignBefore = assignRepository.findByClaim_ClaimId(id).orElseThrow(() -> new EntityNotFoundException("Delete claim test: Assign not found"));
+		Claim claimBefore = claimRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Delete claim test: Claim not found"));
+		
+		// 삭제
+		beneficiaryBefore.setIdentification(null);
+		beneficiaryBefore.setAccount(null);
+		
+		identificationRepository.delete(identificationBefore);
+		anotherSubscribeRepository.delete(anotherSubscribeBefore);
+		accountRepository.delete(accountBefore);
+		assignRepository.delete(assignBefore);
+		claimRepository.delete(claimBefore);
+		
+		// 삭제 후 조회
+		Optional<Identification> identificationAfter = identificationRepository.findByBeneficiary_Contracts_Claim_ClaimId(id);
+		Optional<AnotherSubscribe> anotherSubscribeAfter = anotherSubscribeRepository.findByBeneficiary_Contracts_Claim_ClaimId(id);
+		Optional<Account> accountAfter = accountRepository.findByBeneficiary_Contracts_Claim_ClaimId(id);
+		Optional<Assign> assignAfter = assignRepository.findByClaim_ClaimId(id);
+		Optional<Claim> claimAfter = claimRepository.findById(id);
+		
+		// 삭제 확인
+		assertEquals(true, identificationAfter.isEmpty());
+		assertEquals(true, anotherSubscribeAfter.isEmpty());
+		assertEquals(true, accountAfter.isEmpty());
+		assertEquals(true, assignAfter.isEmpty());
+		assertEquals(true, claimAfter.isEmpty());
+		
+		// 삭제 후 연관 데이터 전체 조회
+		List<IdentificationDto> identificationDtosAfter = identificationRepository.findAll().stream()
+				.map(ide -> dtoConverter.identificationToDto(ide)).collect(Collectors.toList());
+		List<AnotherSubscribeDto> anotherSubscribeDtosAfter = anotherSubscribeRepository.findAll().stream()
+				.map(as -> dtoConverter.anotherSubscribeToDto(as)).collect(Collectors.toList());
+		List<AccountDto> accountDtosAfter = accountRepository.findAll().stream()
+				.map(acc -> dtoConverter.accountToDto(acc)).collect(Collectors.toList());
+		List<AssignDto> assignDtosAfter = assignRepository.findAll().stream().map(assign -> dtoConverter.assignToDto(assign))
+				.collect(Collectors.toList());
+		List<AccidentDto> accidentDtosAfter = accidentRepository.findAll().stream()
+				.map(acc -> dtoConverter.accidentToDto(acc)).collect(Collectors.toList());
+		List<ClaimDto> claimDtosAfter = claimRepository.findAll().stream().map(claim -> dtoConverter.claimToDto(claim))
+				.collect(Collectors.toList());
+
+		assignDtosAfter.forEach(ass -> System.out.println(ass));
+		accidentDtosAfter.forEach(acc -> System.out.println(acc));
+		claimDtosAfter.forEach(cla -> System.out.println(cla));
+		identificationDtosAfter.forEach(ide -> System.out.println(ide));
+		anotherSubscribeDtosAfter.forEach(as -> System.out.println(as));
+		accountDtosAfter.forEach(acc -> System.out.println(acc));
 	}
 }

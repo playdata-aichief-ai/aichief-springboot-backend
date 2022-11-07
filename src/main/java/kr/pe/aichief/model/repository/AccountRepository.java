@@ -11,5 +11,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
 	Optional<Account> findByBeneficiary_BeneficiaryId(int id);
 	
+	Optional<Account> findByBeneficiary_Contracts_Claim_ClaimId(int id);
+	
 	List<Account> findAllByOrderByAccountIdDesc();
 }
