@@ -2,6 +2,7 @@ package kr.pe.aichief.model.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -236,17 +237,39 @@ public class ClaimService {
 	public boolean updateClaim(int claimId, ClaimResult updateInfo) throws JsonMappingException, JsonProcessingException {
 		try {
 			Accident accidentInfoBefore = accidentService.getAccidentByClaimId(claimId).get();
-			System.out.println(accidentInfoBefore);
+			int beneficiaryId = contractRepository.findByClaim_ClaimId(claimId).get().getBeneficiary().getBeneficiaryId();
+			AnotherSubscribe anotherSubscribeInfoBefore = anotherSubscribeRepository.findByBeneficiary_BeneficiaryId(beneficiaryId).get();
+			Identification IdentificationInfoBefore = identificationRepository.findByBeneficiary_BeneficiaryId(beneficiaryId).get();
+			Account accountInfoBefore = accountRepository.findByBeneficiary_BeneficiaryId(beneficiaryId).get();
 			
 			ClaimResult claimInfoUpdate = updateInfo;
 			AccidentDto accidentInfoUpdate = claimInfoUpdate.getAccident();
-			System.out.println(accidentInfoUpdate);
+			AnotherSubscribeDto anotherSubscribeInfoUpdate = claimInfoUpdate.getAnotherSubscribe();
+			IdentificationDto identificationInfoUpdate = claimInfoUpdate.getIdentification();
+			AccountDto accountInfoUpdate = claimInfoUpdate.getAccount();
 			
 			accidentInfoBefore.setLocation(accidentInfoUpdate.getLocation());
 			accidentInfoBefore.setDetails(accidentInfoUpdate.getDetails());
 			accidentInfoBefore.setDiseaseName(accidentInfoUpdate.getDiseaseName());
-			System.out.println(accidentInfoBefore);
+			
+			anotherSubscribeInfoBefore.setCompanyName(anotherSubscribeInfoUpdate.getCompanyName());
+			anotherSubscribeInfoBefore.setNumber(Integer.parseInt(anotherSubscribeInfoUpdate.getNumber()));
+			
+			IdentificationInfoBefore.setNumber(identificationInfoUpdate.getNumber());
+			IdentificationInfoBefore.setSerialNumber(identificationInfoUpdate.getSerialNumber());
+			System.out.println("??");
+			IdentificationInfoBefore.setIssueDate(LocalDate.parse(identificationInfoUpdate.getIssueDate(), DateTimeFormatter.ISO_DATE));
+			System.out.println("??");
+			IdentificationInfoBefore.setIssueBy(identificationInfoUpdate.getIssueBy());
+			
+			accountInfoBefore.setBankName(accountInfoUpdate.getBankName());
+			accountInfoBefore.setNumber(accountInfoUpdate.getNumber());
+			accountInfoBefore.setHolder(accountInfoUpdate.getHolder());
+			
 			accidentRepository.save(accidentInfoBefore);
+			anotherSubscribeRepository.save(anotherSubscribeInfoBefore);
+			identificationRepository.save(IdentificationInfoBefore);
+			accountRepository.save(accountInfoBefore);
 			return true;
 		} catch (Exception e) {
 			return false;
