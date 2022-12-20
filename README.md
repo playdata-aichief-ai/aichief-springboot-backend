@@ -1,29 +1,29 @@
-**Contents**
-- [AI 계장님 - 보험금 청구서 텍스트 인식 웹 서비스](#ai-계장님---보험금-청구서-텍스트-인식-웹-서비스)
-  - [Project Summary](#project-summary)
-  - [Tech Stack for back-end](#tech-stack-for-back-end)
-  - [Project Architecture](#project-architecture)
-  - [Main Service Flow](#main-service-flow)
-  - [DB Tables](#db-tables)
-  - [Environment](#environment)
-  - [Repository Summary](#repository-summary)
-  - [Configuration](#configuration)
-  - [Features on back-end application](#features-on-back-end-application)
+:bookmark_tabs: **Contents**
+- [:page\_facing\_up: AI 계장님 - 보험금 청구서 텍스트 인식 웹 서비스](#page_facing_up-ai-계장님---보험금-청구서-텍스트-인식-웹-서비스)
+  - [:information\_source: Project Summary](#information_source-project-summary)
+  - [:wrench: Tech Stack for back-end](#wrench-tech-stack-for-back-end)
+  - [:construction: Project Architecture](#construction-project-architecture)
+  - [:repeat: Main Service Flow](#repeat-main-service-flow)
+  - [:books: DB Tables](#books-db-tables)
+  - [:cloud: Environment](#cloud-environment)
+  - [:information\_source: Repository Summary](#information_source-repository-summary)
+  - [:open\_file\_folder: Configuration](#open_file_folder-configuration)
+  - [:pushpin: Features on back-end application](#pushpin-features-on-back-end-application)
     - [보험금 청구서 텍스트 인식 요청](#보험금-청구서-텍스트-인식-요청)
     - [보험금 청구서 수정](#보험금-청구서-수정)
     - [보험금 청구서 삭제](#보험금-청구서-삭제)
     - [개인 정보 조회](#개인-정보-조회)
     - [청구 내역 조회](#청구-내역-조회)
-  - [Issues](#issues)
+  - [:warning: Issues](#warning-issues)
     - [CORS (Cross-origin resource sharing)](#cors-cross-origin-resource-sharing)
     - [Entity 연관 관계](#entity-연관-관계)
     - [Entity 순환 참조](#entity-순환-참조)
     - [NPE (NullPointerException)](#npe-nullpointerexception)
 
 ---
-# AI 계장님 - 보험금 청구서 텍스트 인식 웹 서비스
+# :page_facing_up: AI 계장님 - 보험금 청구서 텍스트 인식 웹 서비스
 
-## Project Summary
+## :information_source: Project Summary
 ![project_summary](https://user-images.githubusercontent.com/23309630/208612690-67a50495-c06e-4d7f-94b1-cc3434b8bb43.png)
 **AI 계장님**은 보험금 청구서 접수 과정을 자동화하고 단순화해 사용자가 쉽고 편리하게 보험금을 청구할 수 있도록 개발한 웹 서비스입니다.
 
@@ -42,7 +42,7 @@
 최영준|Text recognition|:link: [Choi-Korean](https://github.com/Choi-Korean)
 
 ---
-## Tech Stack for back-end
+## :wrench: Tech Stack for back-end
 <img src="https://img.shields.io/badge/java-F80000?style=for-the-badge&logo=oracle&logoColor=white">
 <img src="https://img.shields.io/badge/spring_boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
 <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
@@ -52,7 +52,7 @@
 <img src="https://img.shields.io/badge/amazon_s3-569A31?style=for-the-badge&logo=amazons3&logoColor=white">
 
 ---
-## Project Architecture
+## :construction: Project Architecture
 ![proejct_architecture](https://user-images.githubusercontent.com/23309630/208628691-4ac830cc-f4e2-47a7-a829-d9894e0e7160.png)
 - Business : 사용자가 보험금 청구서를 업로드하면 텍스트를 인식해 저장하고 담당자를 배정하는 것이 메인 서비스입니다.
 - Application : Front-end, Back-end, 텍스트 인식 application을 각각 개발했습니다.
@@ -63,7 +63,7 @@
 - Infra : Back-end application과 텍스트 인식 application은 AWS EC2를 활용해 배포했으며, Front-end application은 netlify를 활용해 배포했습니다.
 
 ---
-## Main Service Flow
+## :repeat: Main Service Flow
 ![project_service_flow](https://user-images.githubusercontent.com/23309630/208632103-672673a9-4791-4ce0-a536-dd647840b09a.png)
 1. 사용자는 보험금 청구서를 업로드합니다.
 2. 보험금 청구서 작성 내용의 텍스트 인식을 요청합니다.
@@ -76,7 +76,7 @@
 9. 사용자는 업로드한 보험금 청구서 작성 내용을 수정할 수 있으며, 업로드한 보험금 청구서를 삭제할 수 있습니다.
 
 ---
-## DB Tables
+## :books: DB Tables
 ![db_tables](https://user-images.githubusercontent.com/23309630/208632546-097d9c94-a88a-478f-a8d6-74d0fa954d98.png)
 
 identification(신분증) table column name|설명
@@ -182,7 +182,7 @@ role|역할
 state|상태
 
 ---
-## Environment
+## :cloud: Environment
 ![environment](https://user-images.githubusercontent.com/23309630/208633105-2a7435a7-7777-4537-9515-322f7e5d4df4.png)
 - VPC : 새로운 VPC를 생성해 사용했습니다.
 - Subnet & Availability Zone & Internet gateway : 하나의 가용영역에 하나의 Subnet을 위치시켰으며, EC2 instance가 위치한 subnet은 새로운 routing table을 생성해 internet gateway로 향하는 routing을 추가했습니다.
@@ -194,11 +194,11 @@ state|상태
 - netlify : TypeScript와 Next.js를 활용해 개발한 front-end application 배포를 위해 사용했습니다.
 
 ---
-## Repository Summary
+## :information_source: Repository Summary
 AI 계장님 back-end application source code repository 입니다.
 
 ---
-## Configuration
+## :open_file_folder: Configuration
 ```
 📦 
 ├─ .gitignore
@@ -301,7 +301,7 @@ AI 계장님 back-end application source code repository 입니다.
 ©generated by [Project Tree Generator](https://woochanleee.github.io/project-tree-generator)
 
 ---
-## Features on back-end application
+## :pushpin: Features on back-end application
 ![application_features](https://user-images.githubusercontent.com/23309630/208639015-f1632a88-c1fe-41ef-98a3-b0d68b83eef3.png)
 
 ### 보험금 청구서 텍스트 인식 요청
@@ -520,6 +520,7 @@ public ResponseEntity<MyResponse> deleteClaim(@PathVariable("claimId") int claim
 }
 
 ```
+
 ```java
 // src/main/java/kr/pe/aichief/model/service/ClaimService.java
 
@@ -713,7 +714,7 @@ public List<ClaimResult> getAllBeneficiaryClaims(String email) {
 ```
 
 ---
-## Issues
+## :warning: Issues
 
 ### CORS (Cross-origin resource sharing)
 - 상황 : Front-end application과 Back-end application의 출처(origin)가 서로 달라 CORS issue가 발생했습니다.
