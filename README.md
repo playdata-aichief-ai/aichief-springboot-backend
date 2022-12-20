@@ -688,3 +688,164 @@ public List<ClaimResult> getAllBeneficiaryClaims(String email) {
 	return claimResults;
 }
 ```
+
+---
+## Issues
+
+### CORS (Cross-origin resource sharing)
+- 상황 : Front-end application과 Back-end application의 출처(origin)가 서로 달라 CORS issue가 발생했습니다.
+- 해결 : WebMvcConfigurer interface를 구현하는 WebConfig class를 정의해 명시된 출처에서의 모든 요청을 허용하는 것으로 issue를 해결했습니다.
+```java
+// src/main/java/kr/pe/aichief/config/WebConfig.java
+
+@Configuration
+@EnableWebMvc
+public class WebConfig implements WebMvcConfigurer {
+
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**")
+			.allowedOrigins("https://aichief.netlify.app")
+			.allowedMethods("*")
+			.allowCredentials(true);
+	}
+}
+```
+
+### Entity 연관 관계
+- 상황 : 보험금 청구서 CRUD 기능 및 사용자 정보 조회 기능 개발을 위해 Entity 간 양방향 연관 관계를 맺어야 하는 issue가 발생했습니다.
+- 해결 : mappedBy attribute를 이용해 연관 관계의 주인을 정의해주는 것으로 issue를 해결했습니다. mappedBy attribute의 value가 연관 관계의 주인입니다. 연관 관계의 주인이란 FK(외래키)의 관리 주체를 말합니다.
+```java
+// src/main/java/kr/pe/aichief/model/entity/Beneficiary.java
+
+@Entity
+public class Beneficiary {
+	
+    ...
+	
+	@ToString.Exclude
+	@OneToMany(mappedBy = "beneficiary", cascade = CascadeType.ALL)
+	private List<Insured> insureds;
+
+    ...
+}
+```
+
+```java
+// src/main/java/kr/pe/aichief/model/entity/Insured.java
+
+@Entity
+public class Insured {
+	
+    ...
+	
+	@ToString.Exclude
+	@ManyToOne
+	@JoinColumn(name = "beneficiary_id")
+	private Beneficiary beneficiary;
+
+    ...
+}
+```
+
+### Entity 순환 참조
+- 상황 : 보험금 청구서 조회 기능 개발 중 Entity instance 간 순환 참조하는 issue가 발생했습니다.
+- 해결 : Entity instance를 dto instance로 변환해 사용하고, dto instance로 변환 시 사용하는 toString method에서 순환 참조가 발생하지 않도록 ToString.Exclude annotation을 이용해 순환 참조되는 instance variable을 toString method에서 제외하는 것으로 issue를 해결했습니다.
+```java
+// src/main/java/kr/pe/aichief/model/dto/BeneficiaryDto.java
+
+public class BeneficiaryDto {
+
+	private String beneficiaryId;
+
+    ...
+	
+	private String role;
+}
+```
+
+```java
+// src/main/java/kr/pe/aichief/model/dto/InsuredDto.java
+
+public class InsuredDto {
+
+	private String insuredId;
+
+    ...
+	
+	private String job;
+}
+```
+
+```java
+// src/main/java/kr/pe/aichief/model/entity/Beneficiary.java
+
+@Entity
+public class Beneficiary {
+	
+    ...
+	
+	@ToString.Exclude
+	@OneToMany(mappedBy = "beneficiary", cascade = CascadeType.ALL)
+	private List<Insured> insureds;
+
+    ...
+}
+```
+
+```java
+// src/main/java/kr/pe/aichief/model/entity/Insured.java
+
+@Entity
+public class Insured {
+	
+    ...
+	
+	@ToString.Exclude
+	@ManyToOne
+	@JoinColumn(name = "beneficiary_id")
+	private Beneficiary beneficiary;
+
+    ...
+}
+```
+
+### NPE (NullPointerException)
+- 상황 : 보험금 청구서 작성 내용 텍스트 인식 요청 기능 개발 중 NPE issue가 발생했습니다.
+- 해결 : Optional을 활용해 null을 참조할 경우 사전 정의한 예외를 던져 주는 것으로 NPE 발생을 방지했습니다.
+```java
+// src/main/java/kr/pe/aichief/model/service/ClaimService.java
+
+@Service
+@RequiredArgsConstructor
+public class ClaimService {
+
+    ...
+
+    public ClaimResult serveClaim(ClaimPostRequest claimRequest) throws JsonMappingException, JsonProcessingException {
+
+        ...
+
+        InsuredDto insuredDto = dtoConverter.insuredToDto(
+            insuredRepository.findByBeneficiary_Email(claimRequest.getUser())
+            .orElseThrow(() -> new EntityNotFoundException("Serve claim: Insured not found")));
+
+        ...
+    }
+
+    ...
+}
+```
+
+```java
+// src/main/java/kr/pe/aichief/model/repository/InsuredRepository.java
+
+public interface InsuredRepository extends JpaRepository<Insured, Integer> {
+	
+	...
+	
+	Optional<Insured> findByBeneficiary_Email(String email);
+
+    ...
+}
+```
